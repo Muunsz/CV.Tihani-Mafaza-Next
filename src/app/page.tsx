@@ -1,26 +1,111 @@
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
-import { HeroSection } from '@/components/home/HeroSection';
-import { StatisticsSection } from '@/components/home/StatisticsSection';
-import { USPSection } from '@/components/home/USPSection';
-import { ProductsSection } from '@/components/home/ProductsSection';
-import { ServicesSection } from '@/components/home/ServicesSection';
-import { TestimonialsSection } from '@/components/home/TestimonialsSection';
-import { PartnersSection } from '@/components/home/PartnersSection';
-import { FAQSection } from '@/components/home/FAQSection';
-import { RequestForm } from '@/components/forms/RequestForm';
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { HeroSection } from "@/components/home/HeroSection";
+import { StatisticsSection } from "@/components/home/StatisticsSection";
+import { USPSection } from "@/components/home/USPSection";
+import { ProductsSection } from "@/components/home/ProductsSection";
+import { ServicesSection } from "@/components/home/ServicesSection";
+import { TestimonialsSection } from "@/components/home/TestimonialsSection";
+import { PartnersSection } from "@/components/home/PartnersSection";
+import { FAQSection } from "@/components/home/FAQSection";
+import { RequestForm } from "@/components/forms/RequestForm";
+import { prisma } from "@/lib/prisma";
 
-export default function Home() {
+async function getHomepageData() {
+  try {
+    // Get statistics from database
+    const [totalUsers, totalProducts, totalOrders, totalPartners] =
+      await Promise.all([
+        prisma.users.count(),
+        prisma.products.count({ where: { is_active: true } }),
+        prisma.orders.count(),
+        prisma.users.count({ where: { roles: { name: "customer" } } }),
+      ]);
+
+    // Get featured products
+    const featuredProducts = await prisma.products.findMany({
+      where: {
+        is_featured: true,
+        is_active: true,
+      },
+      include: {
+        categories: true,
+      },
+      take: 6,
+      orderBy: {
+        created_at: "desc",
+      },
+    });
+
+    // Convert Decimal objects to plain numbers for client components
+    const processedProducts = featuredProducts.map((product) => ({
+      ...product,
+      price: Number(product.price),
+      rating: Number(product.rating),
+    }));
+
+    // Get testimonials
+    const testimonials = await prisma.product_reviews.findMany({
+      where: {
+        rating: { gte: 4 },
+        is_approved: true,
+      },
+      include: {
+        users: {
+          select: {
+            full_name: true,
+          },
+        },
+        products: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        created_at: "desc",
+      },
+      take: 6,
+    });
+
+    return {
+      statistics: {
+        totalUsers: totalUsers + 100, // Add some buffer for display
+        totalProducts: totalProducts + 50,
+        totalOrders: totalOrders + 25,
+        totalPartners: totalPartners + 75,
+      },
+      featuredProducts: processedProducts,
+      testimonials,
+    };
+  } catch (error) {
+    console.error("Error fetching homepage data:", error);
+    return {
+      statistics: {
+        totalUsers: 100,
+        totalProducts: 50,
+        totalOrders: 25,
+        totalPartners: 75,
+      },
+      featuredProducts: [],
+      testimonials: [],
+    };
+  }
+}
+
+export default async function Home() {
+  const data = await getHomepageData();
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       <main>
         <HeroSection />
-        <StatisticsSection />
+        <StatisticsSection statistics={data.statistics} />
         <USPSection />
-        <ProductsSection />
+        <ProductsSection products={data.featuredProducts} />
         <ServicesSection />
-        <TestimonialsSection />
+        <TestimonialsSection testimonials={data.testimonials} />
         <PartnersSection />
         <FAQSection />
         <RequestForm />

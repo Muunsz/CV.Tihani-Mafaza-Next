@@ -1,37 +1,37 @@
-'use client';
+"use client";
 
-import { useRef } from "react"
-import React from "react"
-import { useState } from 'react';
-import { SvgCaptcha } from '@/components/auth/SvgCaptcha';
-import { COLORS } from '@/lib/constants';
-import { Send, Upload, AlertCircle } from 'lucide-react';
+import { useRef } from "react";
+import React from "react";
+import { useState } from "react";
+import { SvgCaptcha } from "@/components/auth/SvgCaptcha";
+import { COLORS } from "@/lib/constants";
+import { Send, Upload, AlertCircle } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
 
 const RECAPTCHA_SITE_KEY = "YOUR_RECAPTCHA_SITE_KEY"; // Declare RECAPTCHA_SITE_KEY here
 
 export function RequestForm() {
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    institution: '',
-    itemName: '',
-    specification: '',
-    quantity: '',
-    targetPrice: '',
-    notes: '',
+    name: "",
+    phone: "",
+    institution: "",
+    itemName: "",
+    specification: "",
+    quantity: "",
+    targetPrice: "",
+    notes: "",
   });
 
   const [file, setFile] = useState<File | null>(null);
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [captchaVerified, setCaptchaVerified] = useState(false);
-  const [captchaInput, setCaptchaInput] = useState('');
+  const [captchaInput, setCaptchaInput] = useState("");
   const recaptchaRef = useRef(null);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -43,42 +43,78 @@ export function RequestForm() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     // Validate form
-    if (!formData.name.trim() || !formData.phone.trim() || !formData.institution.trim() ||
-        !formData.itemName.trim() || !formData.specification.trim() || !formData.quantity.trim()) {
-      setError('Semua field yang ditandai dengan * harus diisi');
+    if (
+      !formData.name.trim() ||
+      !formData.phone.trim() ||
+      !formData.institution.trim() ||
+      !formData.itemName.trim() ||
+      !formData.specification.trim() ||
+      !formData.quantity.trim()
+    ) {
+      setError("Semua field yang ditandai dengan * harus diisi");
       return;
     }
 
     if (!captchaVerified) {
-      setError('Verifikasi CAPTCHA terlebih dahulu');
+      setError("Verifikasi CAPTCHA terlebih dahulu");
       return;
     }
 
-    // TODO: Integrate with backend
-    console.log('Form submitted:', { ...formData, file });
-    setSubmitted(true);
+    try {
+      let attachment_url = null;
+      // If file is present, upload to a file server or cloud storage (not implemented here)
+      // For now, skip file upload and just store file name as a placeholder
+      if (file) {
+        attachment_url = file.name;
+      }
 
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        name: '',
-        phone: '',
-        institution: '',
-        itemName: '',
-        specification: '',
-        quantity: '',
-        targetPrice: '',
-        notes: '',
+      const payload = {
+        product_name: formData.itemName,
+        description: formData.specification,
+        requested_quantity: formData.quantity
+          ? parseInt(formData.quantity, 10)
+          : null,
+        notes: formData.notes,
+        // user_id: null // If user is logged in, set user id here
+      };
+
+      const res = await fetch("/api/product-requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
-      setFile(null);
-      setCaptchaVerified(false);
-      setCaptchaInput('');
-    }, 3000);
+      const result = await res.json();
+      if (result.success) {
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          setFormData({
+            name: "",
+            phone: "",
+            institution: "",
+            itemName: "",
+            specification: "",
+            quantity: "",
+            targetPrice: "",
+            notes: "",
+          });
+          setFile(null);
+          setCaptchaVerified(false);
+          setCaptchaInput("");
+        }, 3000);
+      } else {
+        setError(result.error || "Gagal mengirim request.");
+      }
+    } catch (err) {
+      setError("Terjadi kesalahan saat mengirim request.");
+    }
   };
 
   return (
@@ -86,12 +122,15 @@ export function RequestForm() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4" style={{ color: COLORS.primary }}>
+          <h2
+            className="text-4xl font-bold mb-4"
+            style={{ color: COLORS.primary }}
+          >
             Request Barang Custom
           </h2>
           <p className="text-gray-600 text-lg">
-            Tidak menemukan barang yang Anda cari? Hubungi kami untuk pengadaan barang sesuai
-            kebutuhan spesifik Anda.
+            Tidak menemukan barang yang Anda cari? Hubungi kami untuk pengadaan
+            barang sesuai kebutuhan spesifik Anda.
           </p>
         </div>
 
@@ -100,9 +139,12 @@ export function RequestForm() {
           {submitted ? (
             <div className="text-center py-8">
               <div className="text-5xl mb-4">✅</div>
-              <p className="text-lg font-bold text-gray-900 mb-2">Request Berhasil Dikirim!</p>
+              <p className="text-lg font-bold text-gray-900 mb-2">
+                Request Berhasil Dikirim!
+              </p>
               <p className="text-gray-600">
-                Tim kami akan menghubungi Anda dalam waktu 24 jam untuk konfirmasi.
+                Tim kami akan menghubungi Anda dalam waktu 24 jam untuk
+                konfirmasi.
               </p>
             </div>
           ) : (
@@ -110,7 +152,10 @@ export function RequestForm() {
               {/* Error Message */}
               {error && (
                 <div className="flex gap-3 p-4 rounded-lg bg-red-50 border border-red-200">
-                  <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle
+                    size={20}
+                    className="text-red-600 flex-shrink-0 mt-0.5"
+                  />
                   <p className="text-sm text-red-700">{error}</p>
                 </div>
               )}
@@ -128,7 +173,11 @@ export function RequestForm() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+                    style={
+                      {
+                        "--tw-ring-color": COLORS.accent,
+                      } as React.CSSProperties
+                    }
                     placeholder="John Doe"
                   />
                 </div>
@@ -143,7 +192,11 @@ export function RequestForm() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+                    style={
+                      {
+                        "--tw-ring-color": COLORS.accent,
+                      } as React.CSSProperties
+                    }
                     placeholder="+62-812-XXXX-XXXX"
                   />
                 </div>
@@ -161,7 +214,9 @@ export function RequestForm() {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
-                  style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+                  style={
+                    { "--tw-ring-color": COLORS.accent } as React.CSSProperties
+                  }
                   placeholder="Nama Sekolah / Perusahaan"
                 />
               </div>
@@ -179,7 +234,11 @@ export function RequestForm() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+                    style={
+                      {
+                        "--tw-ring-color": COLORS.accent,
+                      } as React.CSSProperties
+                    }
                     placeholder="Contoh: Laptop gaming"
                   />
                 </div>
@@ -194,7 +253,11 @@ export function RequestForm() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+                    style={
+                      {
+                        "--tw-ring-color": COLORS.accent,
+                      } as React.CSSProperties
+                    }
                     placeholder="10"
                     min="1"
                   />
@@ -213,7 +276,9 @@ export function RequestForm() {
                   required
                   rows={3}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
-                  style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+                  style={
+                    { "--tw-ring-color": COLORS.accent } as React.CSSProperties
+                  }
                   placeholder="Jelaskan spesifikasi detail yang dibutuhkan..."
                 />
               </div>
@@ -229,7 +294,9 @@ export function RequestForm() {
                   value={formData.targetPrice}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
-                  style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+                  style={
+                    { "--tw-ring-color": COLORS.accent } as React.CSSProperties
+                  }
                   placeholder="1000000"
                   min="0"
                 />
@@ -244,7 +311,7 @@ export function RequestForm() {
                   <div className="flex flex-col items-center gap-2">
                     <Upload className="w-6 h-6 text-gray-500" />
                     <span className="text-sm text-gray-600">
-                      {file ? file.name : 'Klik untuk upload atau drag file'}
+                      {file ? file.name : "Klik untuk upload atau drag file"}
                     </span>
                   </div>
                   <input
@@ -267,7 +334,9 @@ export function RequestForm() {
                   onChange={handleChange}
                   rows={2}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
-                  style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+                  style={
+                    { "--tw-ring-color": COLORS.accent } as React.CSSProperties
+                  }
                   placeholder="Informasi tambahan atau permintaan khusus..."
                 />
               </div>

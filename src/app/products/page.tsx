@@ -1,11 +1,74 @@
-'use client';
-
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { COLORS, PRODUCTS, PRODUCT_CATEGORIES } from '@/lib/constants';
+import { COLORS } from '@/lib/constants';
 import { ProductGrid } from '@/components/products/ProductGrid';
+import { prisma } from '@/lib/prisma';
 
-export default function ProductsPage() {
+async function getProducts() {
+  try {
+    const products = await prisma.products.findMany({
+      where: { is_active: true },
+      include: {
+        categories: true,
+        _count: {
+          select: { product_reviews: true },
+        },
+      },
+      orderBy: { created_at: 'desc' },
+    });
+
+    return products.map(product => ({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      description: product.description || '',
+      price: Number(product.price), // Convert Decimal to number
+      discount_percentage: product.discount_percentage || 0,
+      stock_quantity: product.stock_quantity || 0,
+      category: product.categories.name,
+      category_id: product.category_id,
+      is_featured: product.is_featured || false,
+      image_url: '/placeholder-product.jpg', // Placeholder image since product_images model doesn't exist
+      rating: Number(product.rating) || 0, // Convert Decimal to number
+      review_count: product._count.product_reviews,
+    }));
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return [];
+  }
+}
+
+async function getCategories() {
+  try {
+    const categories = await prisma.categories.findMany({
+      where: { is_active: true },
+      include: {
+        _count: {
+          select: { products: true },
+        },
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    return categories.map(category => ({
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      description: category.description || '',
+      product_count: category._count.products,
+    }));
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+}
+
+export default async function ProductsPage() {
+  const [products, categories] = await Promise.all([
+    getProducts(),
+    getCategories(),
+  ]);
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -35,19 +98,23 @@ export default function ProductsPage() {
               }}
             >
               <p className="text-gray-700">
-                <strong>Total Produk:</strong> {PRODUCTS.length} item tersedia
+                <strong>Total Produk:</strong> {products.length} item tersedia
                 {' | '}
-                <strong>Kategori:</strong> {PRODUCT_CATEGORIES.length} kategori
+                <strong>Kategori:</strong> {categories.length} kategori
                 {' | '}
                 <strong>Pengiriman:</strong> Ke seluruh Indonesia
               </p>
             </div>
 
             {/* Product Grid with Filters */}
-            <ProductGrid />
+            <ProductGrid initialProducts={products} initialCategories={categories} />
           </div>
         </section>
       </main>
+      <Footer />
+    </div>
+  );
+}
       <Footer />
     </div>
   );

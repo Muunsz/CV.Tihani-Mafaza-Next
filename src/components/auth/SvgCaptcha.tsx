@@ -74,15 +74,21 @@ export function SvgCaptcha({
         </Button>
       </div>
 
-      {/* Input Field */}
-      <div>
+      {/* Input Field with clear label above */}
+      <div className="flex flex-col gap-2">
+        <label
+          htmlFor="captcha-input"
+          className="block text-sm font-semibold text-gray-900 mb-1"
+        >
+          Masukkan kode CAPTCHA di atas
+        </label>
         <Input
+          id="captcha-input"
           type="text"
           value={userInput}
           onChange={handleInputChange}
           placeholder="Masukkan 4 angka"
           maxLength={4}
-          label="Masukkan kode CAPTCHA di atas"
           variant="bordered"
           size="lg"
           className="w-full"

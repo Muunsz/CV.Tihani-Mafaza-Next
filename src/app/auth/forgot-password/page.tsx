@@ -18,6 +18,7 @@ export default function ForgotPasswordPage() {
           {/* Form Container */}
           <div className="bg-white rounded-lg shadow border border-gray-200 p-8">
             <ForgotPasswordForm />
+            
           </div>
 
           {/* Help Text */}

@@ -17,7 +17,7 @@ import { getRecaptchaSiteKey } from '@/lib/recaptcha-config';
 
 export async function GET() {
   try {
-    const siteKey = getRecaptchaSiteKey();
+    const siteKey = await getRecaptchaSiteKey();
 
     return NextResponse.json({
       siteKey,

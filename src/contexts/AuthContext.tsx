@@ -1,7 +1,9 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, UserRole, ROLES } from '@/lib/roles';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { ROLE_PERMISSIONS } from "@/lib/roles";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { User, UserRole, ROLES } from "@/lib/roles";
 
 interface AuthContextType {
   user: User | null;
@@ -9,7 +11,12 @@ interface AuthContextType {
   isAuthenticated: boolean;
   userRole: UserRole;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string, role?: UserRole) => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    name: string,
+    role?: UserRole,
+  ) => Promise<void>;
   logout: () => void;
   hasPermission: (permission: string) => boolean;
 }
@@ -17,77 +24,54 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const { data: session, status } = useSession();
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = status === "loading";
 
-  // Initialize auth state from localStorage
+  // Convert NextAuth session to our User type
   useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+    if (status === "loading") return;
+    if (session?.user) {
+      const userData: User = {
+        id: session.user.id || "1",
+        email: session.user.email || "",
+        name: session.user.name || "",
+        role: (session.user?.role as UserRole) || ROLES.CUSTOMER,
+        createdAt: new Date(),
+        isActive: true,
+      };
+      // Only update if user data changed
+      if (!user || user.id !== userData.id || user.role !== userData.role) {
+        setUser(userData);
       }
-    } catch (error) {
-      console.error('Failed to restore user session:', error);
-    } finally {
-      setIsLoading(false);
+    } else {
+      if (user !== null) setUser(null);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, status]);
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      // TODO: Replace with actual API call
-      // This is a mock implementation
-      const mockUser: User = {
-        id: '1',
-        email,
-        name: email.split('@')[0],
-        role: ROLES.CUSTOMER,
-        createdAt: new Date(),
-        isActive: true,
-      };
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+    if (result?.error) {
+      throw new Error(result.error);
     }
   };
 
-  const register = async (email: string, password: string, name: string, role: UserRole = ROLES.CUSTOMER) => {
-    setIsLoading(true);
-    try {
-      // TODO: Replace with actual API call
-      // This is a mock implementation
-      const newUser: User = {
-        id: Date.now().toString(),
-        email,
-        name,
-        role,
-        createdAt: new Date(),
-        isActive: true,
-      };
-      setUser(newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
-    } catch (error) {
-      console.error('Registration failed:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+  const register = async () => {
+    // TODO: Implement registration API call
+    throw new Error("Registration not implemented yet");
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+  const logout = async () => {
+    await signOut({ callbackUrl: "/" });
   };
 
   const hasPermission = (permission: string): boolean => {
     if (!user) return false;
-    const { ROLE_PERMISSIONS } = require('@/lib/roles');
     return ROLE_PERMISSIONS[user.role]?.includes(permission) ?? false;
   };
 
@@ -112,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 }
