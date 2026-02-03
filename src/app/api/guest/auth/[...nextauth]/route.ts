@@ -9,6 +9,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 
 export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  basePath: "/api/guest/auth",
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",

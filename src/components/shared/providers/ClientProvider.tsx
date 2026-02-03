@@ -17,7 +17,7 @@ interface ClientProviderProps {
 
 export function ClientProvider({ children }: ClientProviderProps) {
   return (
-    <SessionProvider>
+    <SessionProvider basePath="/api/guest/auth">
       <HeroUIProvider>{children}</HeroUIProvider>
     </SessionProvider>
   );

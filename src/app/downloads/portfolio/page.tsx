@@ -70,7 +70,6 @@ function PortfolioCard({ project }: { project: PortfolioProject }) {
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
-      // Simulate file download - in production, this would be a real file
       const response = await fetch(project.downloadUrl);
       if (response.ok) {
         const blob = await response.blob();
@@ -91,7 +90,6 @@ function PortfolioCard({ project }: { project: PortfolioProject }) {
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition group">
-      {/* Image Placeholder */}
       <div className="relative h-48 bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center">
           <ImageIcon size={64} className="text-gray-400" />
@@ -108,7 +106,6 @@ function PortfolioCard({ project }: { project: PortfolioProject }) {
         </div>
       </div>
 
-      {/* Content */}
       <div className="p-6">
         <div className="flex items-start justify-between mb-2">
           <span
@@ -125,7 +122,6 @@ function PortfolioCard({ project }: { project: PortfolioProject }) {
           {project.description}
         </p>
 
-        {/* Stats */}
         <div className="flex items-center justify-between py-3 border-t border-gray-200 text-xs text-gray-600">
           <div className="flex items-center gap-1">
             <Eye size={14} />
@@ -137,7 +133,6 @@ function PortfolioCard({ project }: { project: PortfolioProject }) {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex gap-2 mt-4">
           <button
             onClick={handleDownload}
@@ -173,7 +168,6 @@ export default function PortfolioPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b border-gray-200 py-8">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2" style={{ color: COLORS.primary }}>
@@ -185,9 +179,7 @@ export default function PortfolioPage() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Category Filter */}
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
           {categories.map((category) => (
             <button
@@ -208,14 +200,12 @@ export default function PortfolioPage() {
           ))}
         </div>
 
-        {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredProjects.map((project) => (
             <PortfolioCard key={project.id} project={project} />
           ))}
         </div>
 
-        {/* Empty State */}
         {filteredProjects.length === 0 && (
           <div className="text-center py-16">
             <Briefcase size={64} className="mx-auto mb-4 text-gray-300" />
@@ -226,7 +216,6 @@ export default function PortfolioPage() {
         )}
       </div>
 
-      {/* CTA Section */}
       <div
         className="py-16"
         style={{ backgroundColor: COLORS.primary + "08" }}

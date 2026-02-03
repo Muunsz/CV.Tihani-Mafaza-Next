@@ -176,7 +176,6 @@ export default function CompanyProfilePage() {
           link.download = doc.downloadUrl.split("/").pop() || "document.pdf";
           link.click();
           window.URL.revokeObjectURL(url);
-          // Add delay between downloads
           await new Promise((resolve) => setTimeout(resolve, 500));
         }
       }
@@ -191,10 +190,9 @@ export default function CompanyProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b border-gray-200 py-12">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-start justify-between mb-8">
+          <div className="flex items-start justify-between mb-8 flex-col md:flex-row gap-6">
             <div>
               <h1
                 className="text-4xl font-bold mb-2"
@@ -217,7 +215,6 @@ export default function CompanyProfilePage() {
             </button>
           </div>
 
-          {/* Company Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <h2 className="text-2xl font-bold mb-4">Tentang Kami</h2>
@@ -229,7 +226,6 @@ export default function CompanyProfilePage() {
               </p>
             </div>
 
-            {/* Contact Info */}
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
               <h3 className="text-lg font-bold mb-6">Informasi Kontak</h3>
               <div className="space-y-4">
@@ -273,7 +269,6 @@ export default function CompanyProfilePage() {
         </div>
       </div>
 
-      {/* Stats Section */}
       <div className="bg-white border-b border-gray-200 py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold mb-8 text-center">Pencapaian Kami</h2>
@@ -300,7 +295,6 @@ export default function CompanyProfilePage() {
         </div>
       </div>
 
-      {/* Documents Section */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-bold mb-8">
           Download Dokumentasi Perusahaan
@@ -316,7 +310,6 @@ export default function CompanyProfilePage() {
         </div>
       </div>
 
-      {/* Services Section */}
       <div className="bg-white border-t border-gray-200 py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold mb-8">Layanan Kami</h2>
@@ -356,7 +349,6 @@ export default function CompanyProfilePage() {
         </div>
       </div>
 
-      {/* CTA Section */}
       <div
         className="py-16"
         style={{ backgroundColor: COLORS.primary + "08" }}
