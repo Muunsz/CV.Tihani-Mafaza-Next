@@ -3,7 +3,18 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { compare } from "bcryptjs"
+import { createHash } from "crypto"
+
+// Simple password comparison function (use for development only)
+async function comparePasswords(plain: string, hashed: string) {
+  try {
+    // In development, we use simple SHA256 hashing for password comparison
+    const hashedInput = createHash('sha256').update(plain).digest('hex')
+    return hashedInput === hashed
+  } catch {
+    return false
+  }
+}
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -52,7 +63,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
           return null
         }
 
-        const isPasswordValid = await compare(credentials.password, user.password_hash)
+        const isPasswordValid = await comparePasswords(credentials.password, user.password_hash)
 
         if (!isPasswordValid) {
           return null

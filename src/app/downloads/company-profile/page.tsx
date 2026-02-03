@@ -13,9 +13,11 @@ import {
   Building2,
   CheckCircle,
   Calendar,
+  ArrowLeft,
 } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { COLORS } from "@/lib/constants";
 
 interface DocumentItem {
@@ -161,6 +163,7 @@ const stats = [
 ];
 
 export default function CompanyProfilePage() {
+  const router = useRouter();
   const [downloadAll, setDownloadAll] = useState(false);
 
   const handleDownloadAll = async () => {
@@ -192,6 +195,15 @@ export default function CompanyProfilePage() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200 py-12">
         <div className="max-w-7xl mx-auto px-4">
+          {/* Back Button */}
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition"
+          >
+            <ArrowLeft size={20} />
+            Kembali ke Pusat Unduhan
+          </button>
+
           <div className="flex items-start justify-between mb-8 flex-col md:flex-row gap-6">
             <div>
               <h1

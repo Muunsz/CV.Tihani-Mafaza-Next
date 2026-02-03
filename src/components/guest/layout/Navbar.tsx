@@ -120,18 +120,9 @@ export function Navbar() {
                       session.user?.role === "admin" ||
                       session.user?.role === "staff"
                         ? "/admin/dashboard"
+                        : session.user?.role === "customer"
+                        ? "/customer/dashboard"
                         : "/profile"
-                    }
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href={
-                      session.user?.role === "admin" ||
-                      session.user?.role === "staff"
-                        ? "/admin/dashboard"
-                        : "/customer"
                     }
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg"
                   >
