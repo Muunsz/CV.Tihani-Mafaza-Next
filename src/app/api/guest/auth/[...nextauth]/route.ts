@@ -17,51 +17,16 @@ async function comparePasswords(plain: string, hashed: string) {
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
-const nextAuthConfig = {
+export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   basePath: "/api/guest/auth",
   secret: process.env.NEXTAUTH_SECRET,
   trustHost: true,
   session: {
     strategy: "jwt" as const,
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // 24 hours
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
   },
-  cookies: {
-    sessionToken: {
-      name: isDevelopment ? `next-auth.session-token` : `__Secure-next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax" as const,
-        path: "/",
-        secure: !isDevelopment,
-        domain: isDevelopment ? undefined : process.env.NEXTAUTH_URL?.split("://")[1],
-      },
-    },
-    callbackUrl: {
-      name: isDevelopment ? `next-auth.callback-url` : `__Secure-next-auth.callback-url`,
-      options: {
-        sameSite: "lax" as const,
-        path: "/",
-        secure: !isDevelopment,
-        domain: isDevelopment ? undefined : process.env.NEXTAUTH_URL?.split("://")[1],
-      },
-    },
-    csrfToken: {
-      name: isDevelopment ? `next-auth.csrf-token` : `__Secure-next-auth.csrf-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax" as const,
-        path: "/",
-        secure: !isDevelopment,
-        domain: isDevelopment ? undefined : process.env.NEXTAUTH_URL?.split("://")[1],
-      },
-    },
-  },
-};
-
-export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
-  ...nextAuthConfig,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
