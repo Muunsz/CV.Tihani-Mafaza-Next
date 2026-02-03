@@ -67,6 +67,12 @@ export function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-1">
+            <Link
+              href="/"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-white hover:bg-gray-800 transition flex items-center gap-1"
+            >
+              Beranda
+            </Link>
             {NAVIGATION.map((item) => (
               <div key={item.label} className="relative group">
                 <Link
@@ -135,7 +141,9 @@ export function Navbar() {
                     Profil
                   </Link>
                   <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
+                    onClick={async () => {
+                      await signOut({ callbackUrl: "/" });
+                    }}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg"
                   >
                     Keluar
@@ -162,28 +170,82 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile Auth Buttons - Right */}
+          {/* Mobile Auth Buttons/Profile - Right */}
           <div className="md:hidden flex items-center gap-1 order-last">
-            <Link
-              href="/guest/auth/login"
-              className="px-3 py-2 rounded-lg font-semibold text-sm transition hover:bg-gray-100 border border-gray-200"
-              style={{ color: COLORS.accent }}
-            >
-              Masuk
-            </Link>
-            <Link
-              href="/guest/auth/register"
-              className="px-3 py-2 rounded-lg text-white font-semibold text-sm transition hover:opacity-90"
-              style={{ backgroundColor: COLORS.accent }}
-            >
-              Daftar
-            </Link>
+            {session ? (
+              <div className="relative group">
+                <button className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 hover:bg-gray-100 transition focus:outline-none">
+                  {session.user?.image ? (
+                    <img
+                      src={session.user.image}
+                      alt="Avatar"
+                      className="w-10 h-10 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <User className="w-6 h-6 text-gray-600" />
+                  )}
+                </button>
+                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <Link
+                    href={
+                      session.user?.role === "admin" ||
+                      session.user?.role === "staff"
+                        ? "/admin/dashboard"
+                        : session.user?.role === "customer"
+                        ? "/customer/dashboard"
+                        : "/profile"
+                    }
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/customer/profile"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Profil
+                  </Link>
+                  <button
+                    onClick={async () => {
+                      await signOut({ callbackUrl: "/" });
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg"
+                  >
+                    Keluar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/guest/auth/login"
+                  className="px-3 py-2 rounded-lg font-semibold text-sm transition hover:bg-gray-100 border border-gray-200"
+                  style={{ color: COLORS.accent }}
+                >
+                  Masuk
+                </Link>
+                <Link
+                  href="/guest/auth/register"
+                  className="px-3 py-2 rounded-lg text-white font-semibold text-sm transition hover:opacity-90"
+                  style={{ backgroundColor: COLORS.accent }}
+                >
+                  Daftar
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isOpen && (
           <div className="lg:hidden pb-4 space-y-2">
+            <Link
+              href="/"
+              className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+              onClick={() => setIsOpen(false)}
+            >
+              Beranda
+            </Link>
             {NAVIGATION.map((item) => (
               <div key={item.label}>
                 <button
@@ -254,9 +316,9 @@ export function Navbar() {
                       Profil
                     </Link>
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         setIsOpen(false);
-                        signOut({ callbackUrl: "/" });
+                        await signOut({ callbackUrl: "/" });
                       }}
                       className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
                     >
