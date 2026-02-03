@@ -13,22 +13,28 @@ export default function AuthRedirect() {
 
     if (session?.user) {
       // Fetch user role and redirect
-      fetch("/api/auth/user-role")
+      fetch("/api/guest/auth/session")
         .then((res) => res.json())
-        .then((userData) => {
-          if (userData.role === "admin") {
+        .then((data) => {
+          console.log("[REDIRECT] Session data:", data);
+          const role = data?.user?.role || "guest";
+          
+          if (role === "admin") {
             router.push("/admin/dashboard");
-          } else if (userData.role === "staff") {
-            router.push("/admin/staff");
+          } else if (role === "staff") {
+            router.push("/staff/dashboard");
+          } else if (role === "customer") {
+            router.push("/customer/dashboard");
           } else {
-            router.push("/profile");
+            router.push("/guest/dashboard");
           }
         })
-        .catch(() => {
-          router.push("/profile"); // fallback
+        .catch((err) => {
+          console.error("[REDIRECT] Error fetching session:", err);
+          router.push("/guest/dashboard"); // fallback
         });
     } else {
-      router.push("/auth/login");
+      router.push("/guest/auth/login");
     }
   }, [session, status, router]);
 
