@@ -12,6 +12,27 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      console.log("[LOGOUT] Starting logout process");
+      
+      const result = await signOut({
+        redirect: true,
+        callbackUrl: "/",
+      });
+      
+      console.log("[LOGOUT] SignOut result:", result);
+    } catch (error) {
+      console.error("[LOGOUT] Error during logout:", error);
+      // Force redirect even if signOut fails
+      window.location.href = "/";
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -141,12 +162,11 @@ export function Navbar() {
                     Profil
                   </Link>
                   <button
-                    onClick={async () => {
-                      await signOut({ callbackUrl: "/" });
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Keluar
+                    {isLoggingOut ? "Keluar..." : "Keluar"}
                   </button>
                 </div>
               </div>
@@ -206,12 +226,11 @@ export function Navbar() {
                     Profil
                   </Link>
                   <button
-                    onClick={async () => {
-                      await signOut({ callbackUrl: "/" });
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Keluar
+                    {isLoggingOut ? "Keluar..." : "Keluar"}
                   </button>
                 </div>
               </div>
@@ -316,13 +335,14 @@ export function Navbar() {
                       Profil
                     </Link>
                     <button
-                      onClick={async () => {
+                      onClick={() => {
                         setIsOpen(false);
-                        await signOut({ callbackUrl: "/" });
+                        handleLogout();
                       }}
-                      className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
+                      disabled={isLoggingOut}
+                      className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Keluar
+                      {isLoggingOut ? "Keluar..." : "Keluar"}
                     </button>
                   </div>
                 </div>
