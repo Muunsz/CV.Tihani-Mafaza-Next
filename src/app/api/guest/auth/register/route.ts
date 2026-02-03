@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { ApiResponse, handleError } from '@/lib/api/response';
 import { ApiError } from '@/lib/api/errors';
 import { registerSchema } from '@/lib/validations';
-import bcrypt from 'bcryptjs';
+import { hash } from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+    const hashedPassword = await hash(validatedData.password, 10);
 
     // Create user (default role: customer = 3)
     const user = await prisma.users.create({

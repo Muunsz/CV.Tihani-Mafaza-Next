@@ -159,7 +159,7 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
             Password
           </label>
           <Link
-            href="/auth/forgot-password"
+            href="/guest/auth/forgot-password"
             className="text-sm hover:underline"
             style={{ color: COLORS.accent }}
           >
