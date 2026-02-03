@@ -1,14 +1,14 @@
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { HeroSection } from "@/components/home/HeroSection";
-import { StatisticsSection } from "@/components/home/StatisticsSection";
-import { USPSection } from "@/components/home/USPSection";
-import { ProductsSection } from "@/components/home/ProductsSection";
-import { ServicesSection } from "@/components/home/ServicesSection";
-import { TestimonialsSection } from "@/components/home/TestimonialsSection";
-import { PartnersSection } from "@/components/home/PartnersSection";
-import { FAQSection } from "@/components/home/FAQSection";
-import { RequestForm } from "@/components/forms/RequestForm";
+import { Navbar } from "@/components/guest/layout/Navbar";
+import { Footer } from "@/components/guest/layout/Footer";
+import { HeroSection } from "@/components/guest/home/HeroSection";
+import { StatisticsSection } from "@/components/guest/home/StatisticsSection";
+import { USPSection } from "@/components/guest/home/USPSection";
+import { ProductsSection } from "@/components/guest/home/ProductsSection";
+import { ServicesSection } from "@/components/guest/home/ServicesSection";
+import { TestimonialsSection } from "@/components/guest/home/TestimonialsSection";
+import { PartnersSection } from "@/components/guest/home/PartnersSection";
+import { FAQSection } from "@/components/guest/home/FAQSection";
+import { RequestForm } from "@/components/shared/forms/RequestForm";
 import { prisma } from "@/lib/prisma";
 
 async function getHomepageData() {

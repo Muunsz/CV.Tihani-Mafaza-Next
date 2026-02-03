@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Card } from "@heroui/react";
+import AdminSidebar from "../../components/admin/AdminSidebar";
 
 const roles = [
   {
@@ -49,6 +50,7 @@ const roles = [
 export default function AdminGateway() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <AdminSidebar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center mb-12">
@@ -66,8 +68,8 @@ export default function AdminGateway() {
             className="mt-6 text-lg italic text-gray-700 border-l-4 px-4"
             style={{ borderColor: COLORS.accent }}
           >
-            &quot;Kepuasan Anda adalah Prestasi Kami&quot; - &quot;A thousand miles journey
-            begins with one small step&quot;
+            &quot;Kepuasan Anda adalah Prestasi Kami&quot; - &quot;A thousand
+            miles journey begins with one small step&quot;
           </blockquote>
         </div>
 

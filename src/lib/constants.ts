@@ -297,30 +297,54 @@ export const NAVIGATION = [
     label: 'Tentang Kami',
     href: '#',
     submenu: [
-      { label: 'Profil Perusahaan', href: '/about' },
-      { label: 'Tim Kami', href: '/team' },
-      { label: 'Jejak Langkah', href: '/history' },
+      { label: 'Profil Perusahaan', href: '/guest/about' },
+      { label: 'Tim Kami', href: '/guest/team' },
+      { label: 'Jejak Langkah', href: '/guest/history' },
     ],
   },
-  { label: 'Produk & Layanan', href: '/products' },
+  { label: 'Produk & Layanan', href: '/guest/products' },
   {
     label: 'Portofolio',
     href: '#',
     submenu: [
-      { label: 'Galeri Proyek', href: '/portfolio' },
-      { label: 'Testimoni Klien', href: '/testimonials' },
+      { label: 'Galeri Proyek', href: '/guest/portfolio' },
+      { label: 'Testimoni Klien', href: '/guest/testimonials' },
     ],
   },
   {
     label: 'Pusat Informasi',
     href: '#',
     submenu: [
-      { label: 'Artikel & Blog', href: '/blog' },
-      { label: 'Karir', href: '/careers' },
-      { label: 'FAQ', href: '/faq' },
+      { label: 'Artikel & Blog', href: '/guest/blog' },
+      { label: 'Karir', href: '/guest/careers' },
+      { label: 'FAQ', href: '/guest/faq' },
     ],
   },
-  { label: 'Kontak', href: '/contact' },
+  { label: 'Kontak', href: '/guest/contact' },
+] as const;
+
+// Navigation untuk Admin
+export const ADMIN_NAVIGATION = [
+  { label: 'Dashboard', href: '/admin/dashboard' },
+  { label: 'Manajemen Customer', href: '/admin/customer' },
+  { label: 'Manajemen Staff', href: '/admin/staff-management' },
+  { label: 'Kelola Produk', href: '/admin/products' },
+  { label: 'Kelola Pesanan', href: '/admin/orders' },
+] as const;
+
+// Navigation untuk Customer
+export const CUSTOMER_NAVIGATION = [
+  { label: 'Dashboard', href: '/customer/dashboard' },
+  { label: 'Pesanan Saya', href: '/customer/orders' },
+  { label: 'Profil', href: '/customer/profile' },
+  { label: 'Keranjang', href: '/customer/cart' },
+] as const;
+
+// Navigation untuk Staff
+export const STAFF_NAVIGATION = [
+  { label: 'Dashboard', href: '/staff/dashboard' },
+  { label: 'Kelola Pesanan', href: '/staff/orders' },
+  { label: 'Laporan', href: '/staff/reports' },
 ] as const;
 
 // Re-export MOCK_ORDERS from admin-constants for backward compatibility

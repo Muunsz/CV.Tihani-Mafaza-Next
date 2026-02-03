@@ -2,8 +2,8 @@ import React from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { ClientProvider } from "@/components/providers/ClientProvider";
-import { FloatingActionButton } from "@/components/layout/FloatingActionButton";
+import { ClientProvider } from "@/components/shared/providers/ClientProvider";
+import { FloatingActionButton } from "@/components/guest/layout/FloatingActionButton";
 import "./globals.css";
 
 const _geist = Geist({ subsets: ["latin"] });
