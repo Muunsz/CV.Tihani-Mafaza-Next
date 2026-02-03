@@ -7,6 +7,7 @@ import Link from "next/link";
 import { signIn, useSession } from "next-auth/react";
 import { COLORS } from "@/lib/constants";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { SvgCaptcha } from "./SvgCaptcha";
 
 interface LoginFormProps {
   onSubmit?: (email: string, password: string) => void;
@@ -19,6 +20,8 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [captchaInput, setCaptchaInput] = useState("");
 
   // Auto-redirect if already logged in
   useEffect(() => {
@@ -52,6 +55,11 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
 
     if (!email.includes("@")) {
       setError("Format email tidak valid");
+      return;
+    }
+
+    if (!captchaVerified) {
+      setError("Silakan verifikasi CAPTCHA terlebih dahulu");
       return;
     }
 
@@ -179,6 +187,13 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
         </label>
       </div>
 
+      {/* SVG CAPTCHA */}
+      <SvgCaptcha
+        onVerified={setCaptchaVerified}
+        onInputChange={setCaptchaInput}
+        inputValue={captchaInput}
+      />
+
       {/* Submit Button */}
       <button
         type="submit"
@@ -193,7 +208,7 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
       <p className="text-center text-gray-600">
         Belum punya akun?{" "}
         <Link
-          href="/auth/register"
+          href="/guest/auth/register"
           className="font-semibold hover:underline"
           style={{ color: COLORS.accent }}
         >

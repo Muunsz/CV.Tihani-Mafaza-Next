@@ -15,8 +15,15 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { AlertCircle, TrendingUp, Users, Zap } from "lucide-react";
-import AdminSidebar from "@/components/admin/AdminSidebar";
+import {
+  AlertCircle,
+  TrendingUp,
+  Users,
+  Zap,
+  ShoppingCart,
+  Eye,
+  Clock,
+} from "lucide-react";
 
 const revenueData = [
   { month: "Jan", revenue: 4.2, target: 4.5 },
@@ -36,8 +43,71 @@ const userData = [
 ];
 
 function AdminDashboardContent() {
+  // Summary stats
+  const stats = [
+    {
+      label: "Total Pesanan",
+      value: "1,247",
+      change: "+12.5%",
+      icon: ShoppingCart,
+      color: COLORS.accent,
+    },
+    {
+      label: "Total Produk",
+      value: "340",
+      change: "+5.2%",
+      icon: TrendingUp,
+      color: COLORS.primary,
+    },
+    {
+      label: "Total Users",
+      value: "2,543",
+      change: "+8.1%",
+      icon: Users,
+      color: "#10b981",
+    },
+    {
+      label: "Pengunjung Aktif",
+      value: "847",
+      change: "+15.3%",
+      icon: Eye,
+      color: "#8b5cf6",
+    },
+  ];
+
   return (
     <div className="space-y-8">
+      {/* Summary Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <div
+              key={stat.label}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-gray-600 text-sm font-medium">
+                    {stat.label}
+                  </p>
+                  <h3 className="text-2xl font-bold mt-2">{stat.value}</h3>
+                  <p className="text-xs text-green-600 font-semibold mt-1">
+                    {stat.change}
+                  </p>
+                </div>
+                <div
+                  className="w-12 h-12 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: `${stat.color}15` }}
+                >
+                  <Icon size={24} style={{ color: stat.color }} />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
       {/* Admin Metrics */}
       <AdminMetrics />
 
@@ -280,12 +350,7 @@ export default function AdminDashboard() {
       title="Admin Dashboard"
       subtitle="Kelola sistem dan monitor performa secara real-time"
     >
-      <div className="flex">
-        <AdminSidebar />
-        <div className="flex-1 p-6">
-          <AdminDashboardContent />
-        </div>
-      </div>
+      <AdminDashboardContent />
     </RoleLayout>
   );
 }

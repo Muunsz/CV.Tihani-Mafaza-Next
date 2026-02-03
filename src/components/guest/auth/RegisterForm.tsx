@@ -92,7 +92,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch("/api/guest/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -115,7 +115,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
 
       // Success - redirect to login or show success message
       alert("Pendaftaran berhasil! Silakan login dengan akun Anda.");
-      window.location.href = "/auth/login";
+      window.location.href = "/guest/auth/login";
     } catch (err: any) {
       setError(err.message || "Terjadi kesalahan saat pendaftaran");
     } finally {
@@ -345,7 +345,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
       <p className="text-center text-gray-600">
         Sudah punya akun?{" "}
         <Link
-          href="/auth/login"
+          href="/guest/auth/login"
           className="font-semibold hover:underline"
           style={{ color: COLORS.accent }}
         >

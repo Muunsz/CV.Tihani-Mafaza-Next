@@ -7,7 +7,10 @@ export interface CaptchaData {
   id: string;
 }
 
-export function useSvgCaptcha() {
+export function useSvgCaptcha(
+  generateUrl: string = '/api/guest/captcha/generate',
+  verifyUrl: string = '/api/guest/captcha/verify'
+) {
   const [captchaData, setCaptchaData] = useState<CaptchaData | null>(null);
   const [userInput, setUserInput] = useState('');
   const [isVerified, setIsVerified] = useState(false);
@@ -16,7 +19,7 @@ export function useSvgCaptcha() {
   // Generate new CAPTCHA
   const generateCaptcha = useCallback(async () => {
     try {
-      const response = await fetch('/api/captcha/generate', {
+      const response = await fetch(generateUrl, {
         method: 'POST',
       });
 
@@ -44,7 +47,7 @@ export function useSvgCaptcha() {
       }
 
       try {
-        const response = await fetch('/api/captcha/verify', {
+        const response = await fetch(verifyUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

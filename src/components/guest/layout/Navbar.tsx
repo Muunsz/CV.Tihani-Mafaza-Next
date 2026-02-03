@@ -127,7 +127,18 @@ export function Navbar() {
                     Dashboard
                   </Link>
                   <Link
-                    href="/profile"
+                    href={
+                      session.user?.role === "admin" ||
+                      session.user?.role === "staff"
+                        ? "/admin/dashboard"
+                        : "/customer"
+                    }
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/customer/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Profil
@@ -163,14 +174,14 @@ export function Navbar() {
           {/* Mobile Auth Buttons - Right */}
           <div className="md:hidden flex items-center gap-1 order-last">
             <Link
-              href="/auth/login"
+              href="/guest/auth/login"
               className="px-3 py-2 rounded-lg font-semibold text-sm transition hover:bg-gray-100 border border-gray-200"
               style={{ color: COLORS.accent }}
             >
               Masuk
             </Link>
             <Link
-              href="/auth/register"
+              href="/guest/auth/register"
               className="px-3 py-2 rounded-lg text-white font-semibold text-sm transition hover:opacity-90"
               style={{ backgroundColor: COLORS.accent }}
             >
@@ -210,6 +221,7 @@ export function Navbar() {
                         key={subitem.label}
                         href={subitem.href}
                         className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
+                        onClick={() => setIsOpen(false)}
                       >
                         {subitem.label}
                       </Link>
@@ -244,13 +256,17 @@ export function Navbar() {
                   </div>
                   <div className="space-y-1">
                     <Link
-                      href="/profile"
+                      href="/customer/profile"
                       className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
+                      onClick={() => setIsOpen(false)}
                     >
                       Profil
                     </Link>
                     <button
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={() => {
+                        setIsOpen(false);
+                        signOut({ callbackUrl: "/" });
+                      }}
                       className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
                     >
                       Keluar
