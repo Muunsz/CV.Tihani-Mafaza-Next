@@ -3,7 +3,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
-import bcrypt from "bcryptjs"
+import { compare } from "bcryptjs"
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -51,7 +51,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
           return null
         }
 
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password_hash)
+        const isPasswordValid = await compare(credentials.password, user.password_hash)
 
         if (!isPasswordValid) {
           return null
@@ -68,8 +68,8 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
     })
   ],
   pages: {
-    signIn: "/auth/login",
-    error: "/auth/login",
+    signIn: "/guest/auth/login",
+    error: "/guest/auth/login",
   },
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -156,9 +156,9 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
           case 'admin':
             return `${baseUrl}/admin/dashboard`;
           case 'staff':
-            return `${baseUrl}/admin/dashboard`;
+            return `${baseUrl}/staff/dashboard`;
           case 'customer':
-            return `${baseUrl}/profile`;
+            return `${baseUrl}/customer/dashboard`;
           default:
             return `${baseUrl}`;
         }
