@@ -12,21 +12,28 @@ export default function AuthRedirect() {
     if (status === "loading") return;
 
     if (session?.user) {
-      console.log("[REDIRECT] Session user:", session.user);
-      const role = (session.user as any)?.role || "guest";
-      console.log("[REDIRECT] User role:", role);
-      
-      if (role === "admin") {
-        router.push("/admin/dashboard");
-      } else if (role === "staff") {
-        router.push("/staff/dashboard");
-      } else if (role === "customer") {
-        router.push("/customer/dashboard");
-      } else {
-        router.push("/guest/dashboard");
-      }
+      // Fetch user role and redirect
+      fetch("/api/guest/auth/session")
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("[REDIRECT] Session data:", data);
+          const role = data?.user?.role || "guest";
+          
+          if (role === "admin") {
+            router.push("/admin/dashboard");
+          } else if (role === "staff") {
+            router.push("/staff/dashboard");
+          } else if (role === "customer") {
+            router.push("/customer/dashboard");
+          } else {
+            router.push("/guest/dashboard");
+          }
+        })
+        .catch((err) => {
+          console.error("[REDIRECT] Error fetching session:", err);
+          router.push("/guest/dashboard"); // fallback
+        });
     } else {
-      console.log("[REDIRECT] No session found, redirecting to login");
       router.push("/guest/auth/login");
     }
   }, [session, status, router]);

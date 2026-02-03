@@ -161,14 +161,14 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
         return false;
       }
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       try {
         if (user) {
-          token.id = user.id || token.sub;
-          token.role = (user as any).role || 'guest';
+          token.id = user.id;
+          token.role = user.role;
           token.email = user.email;
-        } else if (token.email && !token.role) {
-          // For subsequent requests or OAuth users, fetch fresh user data
+        } else if (token.email) {
+          // For subsequent requests, fetch fresh user data
           const dbUser = await prisma.users.findUnique({
             where: { email: token.email },
             include: { roles: true }
@@ -187,9 +187,9 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       try {
         if (session.user) {
-          (session.user as any).id = token.id as string;
-          (session.user as any).role = token.role as string;
-          (session.user as any).email = token.email as string;
+          session.user.id = token.id as string;
+          session.user.role = token.role as string;
+          session.user.email = token.email as string;
         }
       } catch (error) {
         console.error("[AUTH] Session callback error:", error);

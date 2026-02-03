@@ -69,14 +69,37 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
       const result = await signIn("credentials", {
         email,
         password,
-        redirect: true,
-        callbackUrl: "/guest/auth/redirect",
+        redirect: false,
       });
 
       console.log("[LOGIN] Sign in result:", result);
+
+      if (result?.error) {
+        setError("Email atau password salah");
+        setIsLoading(false);
+      } else if (result?.ok) {
+        // Redirect based on session data
+        try {
+          const sessionRes = await fetch("/api/guest/auth/session");
+          const sessionData = await sessionRes.json();
+          console.log("[LOGIN] Session data:", sessionData);
+          
+          const role = sessionData?.user?.role || "guest";
+          const redirectUrl = 
+            role === "admin" ? "/admin/dashboard" :
+            role === "staff" ? "/staff/dashboard" :
+            role === "customer" ? "/customer/dashboard" :
+            "/guest/dashboard";
+          
+          window.location.href = redirectUrl;
+        } catch (err) {
+          console.error("[LOGIN] Session fetch error:", err);
+          window.location.href = "/guest/dashboard";
+        }
+      }
     } catch (err: any) {
       console.error("[LOGIN] SignIn error:", err);
-      setError("Email atau password salah");
+      setError(err.message || "Terjadi kesalahan saat masuk");
       setIsLoading(false);
     }
   };
@@ -87,11 +110,40 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
       console.log("[GOOGLE_LOGIN] Starting Google sign in");
       
       const result = await signIn("google", {
-        redirect: true,
-        callbackUrl: "/guest/auth/redirect",
+        redirect: false,
+        callbackUrl: "/auth/redirect",
       });
 
       console.log("[GOOGLE_LOGIN] Google sign in result:", result);
+
+      if (result?.error) {
+        setError("Gagal login dengan Google. Silakan coba lagi.");
+        console.error("[GOOGLE_LOGIN] Error:", result.error);
+        setGoogleLoading(false);
+      } else if (result?.ok) {
+        // Wait for session to be established
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        try {
+          const sessionRes = await fetch("/api/guest/auth/session");
+          const sessionData = await sessionRes.json();
+          console.log("[GOOGLE_LOGIN] Session after login:", sessionData);
+          
+          const role = sessionData?.user?.role || "customer";
+          const redirectUrl = 
+            role === "admin" ? "/admin/dashboard" :
+            role === "staff" ? "/staff/dashboard" :
+            role === "customer" ? "/customer/dashboard" :
+            "/guest/dashboard";
+          
+          console.log("[GOOGLE_LOGIN] Redirecting to:", redirectUrl);
+          window.location.href = redirectUrl;
+        } catch (err) {
+          console.error("[GOOGLE_LOGIN] Session fetch error:", err);
+          // Default redirect for new users
+          window.location.href = "/customer/dashboard";
+        }
+      }
     } catch (error: any) {
       console.error("[GOOGLE_LOGIN] Unexpected error:", error);
       setError("Gagal login dengan Google. Silakan coba lagi.");
