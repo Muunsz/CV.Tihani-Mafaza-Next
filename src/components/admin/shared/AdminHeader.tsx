@@ -1,7 +1,7 @@
 'use client';
 
 import { COLORS, CONTACT } from '@/lib/constants';
-import { Bell, Search, User, MessageSquare, LogOut } from 'lucide-react';
+import { Bell, Search, User, MessageSquare, LogOut, Smartphone, Monitor } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 
@@ -12,6 +12,7 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/' });
@@ -38,6 +39,19 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
 
         {/* Right Actions */}
         <div className="flex items-center gap-2 sm:gap-4">
+          {/* Mobile Version Toggle */}
+          <button
+            onClick={() => setIsMobileView(!isMobileView)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition duration-200 hidden lg:block"
+            title={isMobileView ? "Desktop View" : "Mobile View"}
+          >
+            {isMobileView ? (
+              <Monitor size={20} style={{ color: COLORS.accent }} />
+            ) : (
+              <Smartphone size={20} style={{ color: COLORS.primary }} />
+            )}
+          </button>
+
           {/* Search - Hidden on mobile */}
           <div className="hidden md:flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg border border-gray-200">
             <Search size={18} className="text-gray-400" />

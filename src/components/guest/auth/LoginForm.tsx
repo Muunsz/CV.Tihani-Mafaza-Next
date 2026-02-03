@@ -76,7 +76,7 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
         setError("Email atau password salah");
       } else {
         // Redirect to dashboard sesuai role
-        const res = await fetch("/api/auth/session");
+        const res = await fetch("/api/guest/auth/session");
         const data = await res.json();
         if (data?.user?.role === "admin") {
           window.location.href = "/admin/dashboard";
@@ -100,13 +100,32 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      await signIn("google", {
-        callbackUrl: "/customer/dashboard",
-        redirect: true,
+      const result = await signIn("google", {
+        redirect: false,
       });
-    } catch (error) {
-      console.error("Google sign in error:", error);
+      
+      if (result?.error) {
+        setError("Gagal login dengan Google. Silakan coba lagi.");
+        console.error("Google sign in error:", result.error);
+      } else if (result?.ok) {
+        // Wait for session to be set, then redirect based on role
+        setTimeout(async () => {
+          const res = await fetch("/api/guest/auth/session");
+          const data = await res.json();
+          if (data?.user?.role === "admin") {
+            window.location.href = "/admin/dashboard";
+          } else if (data?.user?.role === "staff") {
+            window.location.href = "/staff/dashboard";
+          } else if (data?.user?.role === "customer") {
+            window.location.href = "/customer/dashboard";
+          } else {
+            window.location.href = "/profile";
+          }
+        }, 500);
+      }
+    } catch (error: any) {
       setError("Gagal login dengan Google. Silakan coba lagi.");
+      console.error("Google sign in error:", error);
     } finally {
       setGoogleLoading(false);
     }
