@@ -1,7 +1,8 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Button, Card, CardBody } from '@heroui/react';
-import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Home, RefreshCw, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { COLORS } from '@/lib/constants';
 
@@ -12,6 +13,8 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center px-4">
       <Card className="w-full max-w-md shadow-xl">
@@ -43,6 +46,15 @@ export default function ErrorPage({
               size="lg"
               className="w-full text-white font-semibold"
               style={{ backgroundColor: COLORS.primary }}
+              startContent={<ArrowLeft className="w-5 h-5" />}
+              onPress={() => router.back()}
+            >
+              Kembali ke Halaman Sebelumnya
+            </Button>
+            <Button
+              size="lg"
+              className="w-full text-white font-semibold"
+              style={{ backgroundColor: COLORS.accent }}
               startContent={<RefreshCw className="w-5 h-5" />}
               onPress={reset}
             >

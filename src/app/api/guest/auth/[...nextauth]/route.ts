@@ -3,12 +3,30 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
-import bcrypt from "bcryptjs"
+
+
+
+// Simple password comparison function (Edge Runtime compatible)
+async function comparePasswords(plain: string, hashed: string) {
+  try {
+    // Use Web Crypto API for SHA-256 hashing
+    const encoder = new TextEncoder();
+    const data = encoder.encode(plain);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashHex = Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    return hashHex === hashed;
+  } catch {
+    return false;
+  }
+}
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
 export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  basePath: "/api/guest/auth",
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
@@ -39,22 +57,27 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null
+          console.log("[AUTH] Email/password kosong");
+          return null;
         }
 
         const user = await prisma.users.findUnique({
           where: { email: credentials.email },
           include: { roles: true }
-        })
+        });
+        console.log("[AUTH] User found:", user);
 
         if (!user || !user.password_hash) {
-          return null
+          console.log("[AUTH] User tidak ditemukan atau password_hash kosong");
+          return null;
         }
 
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password_hash)
+        const isPasswordValid = await comparePasswords(credentials.password, user.password_hash);
+        console.log("[AUTH] Password valid:", isPasswordValid);
 
         if (!isPasswordValid) {
-          return null
+          console.log("[AUTH] Password tidak cocok");
+          return null;
         }
 
         return {
@@ -63,13 +86,13 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
           name: user.full_name,
           image: user.avatar_url,
           role: user.roles.name,
-        }
+        };
       }
     })
   ],
   pages: {
-    signIn: "/auth/login",
-    error: "/auth/login",
+    signIn: "/guest/auth/login",
+    error: "/guest/auth/login",
   },
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -156,9 +179,9 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
           case 'admin':
             return `${baseUrl}/admin/dashboard`;
           case 'staff':
-            return `${baseUrl}/admin/dashboard`;
+            return `${baseUrl}/staff/dashboard`;
           case 'customer':
-            return `${baseUrl}/profile`;
+            return `${baseUrl}/customer/dashboard`;
           default:
             return `${baseUrl}`;
         }

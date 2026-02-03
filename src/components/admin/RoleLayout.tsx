@@ -22,9 +22,11 @@ export function RoleLayout({ children, role, title, subtitle }: RoleLayoutProps)
         {/* Header */}
         <AdminHeader title={title} subtitle={subtitle} />
 
-        {/* Content */}
-        <div className="flex-1 overflow-auto p-4 sm:p-6">
-          {children}
+        {/* Content Area with proper scrolling */}
+        <div className="flex-1 overflow-auto bg-gray-50">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+            {children}
+          </div>
         </div>
       </div>
     </div>

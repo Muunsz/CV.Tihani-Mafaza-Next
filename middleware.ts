@@ -5,52 +5,84 @@ export default auth(async (req) => {
   const { pathname } = req.nextUrl;
 
   // Protected routes that require authentication
+  const adminRoutes = ["/admin"];
+  const staffRoutes = ["/staff"];
+  const customerRoutes = ["/customer", "/orders", "/cart", "/wishlist"];
+  const publicGuestRoutes = ["/guest"];
+
+  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
+  const isStaffRoute = staffRoutes.some((route) => pathname.startsWith(route));
+  const isCustomerRoute = customerRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+  const isPublicGuestRoute = publicGuestRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+
   const protectedRoutes = [
-    "/admin",
-    "/profile",
-    "/orders",
-    "/cart",
-    "/wishlist",
-    "/notifications",
+    ...adminRoutes,
+    ...staffRoutes,
+    ...customerRoutes,
+    ...publicGuestRoutes,
   ];
 
-
-  // Check if route is protected
   const isProtected = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
 
+  // Check authentication
   if (isProtected && !req.auth) {
-    // Redirect to login
-    return Response.redirect(new URL("/auth/login", req.url));
+    return Response.redirect(new URL("/guest/auth/login", req.url));
   }
 
-  // Role-based access control for /admin and /profile
+  // Role-based access control
   if (req.auth && req.auth.user) {
     const userRole = req.auth.user.role;
-    // If accessing /admin but not allowed
-    if (pathname.startsWith("/admin")) {
-      if (userRole === "admin" && !pathname.startsWith("/admin/dashboard")) {
-        // Allow admin to access all /admin
-        return null;
+
+    // Admin routes - only admin can access
+    if (isAdminRoute) {
+      if (userRole !== "admin") {
+        if (userRole === "staff") {
+          return Response.redirect(new URL("/staff/dashboard", req.url));
+        } else if (userRole === "customer") {
+          return Response.redirect(new URL("/customer/dashboard", req.url));
+        } else {
+          return Response.redirect(new URL("/guest/auth/login", req.url));
+        }
       }
-      if (userRole === "staff" && !pathname.startsWith("/admin/staff")) {
-        // Redirect staff to their dashboard
-        return Response.redirect(new URL("/admin/staff", req.url));
-      }
-      if (userRole === "customer" || userRole === "guest") {
-        // Redirect customer/guest to profile or login
-        return Response.redirect(new URL("/profile", req.url));
-      }
+      return null;
     }
-    // If accessing /profile but not allowed
-    if (pathname.startsWith("/profile") && userRole === "admin") {
-      // Redirect admin to admin dashboard
-      return Response.redirect(new URL("/admin/dashboard", req.url));
+
+    // Staff routes - only staff and admin can access
+    if (isStaffRoute) {
+      if (userRole !== "staff" && userRole !== "admin") {
+        if (userRole === "customer") {
+          return Response.redirect(new URL("/customer/dashboard", req.url));
+        } else {
+          return Response.redirect(new URL("/guest/auth/login", req.url));
+        }
+      }
+      return null;
     }
-    if (pathname.startsWith("/profile") && userRole === "staff") {
-      // Redirect staff to staff dashboard
-      return Response.redirect(new URL("/admin/staff", req.url));
+
+    // Customer routes - only customer can access
+    if (isCustomerRoute) {
+      if (userRole !== "customer") {
+        if (userRole === "admin") {
+          return Response.redirect(new URL("/admin/dashboard", req.url));
+        } else if (userRole === "staff") {
+          return Response.redirect(new URL("/staff/dashboard", req.url));
+        } else {
+          return Response.redirect(new URL("/guest/auth/login", req.url));
+        }
+      }
+      return null;
+    }
+
+    // Guest routes
+    if (isPublicGuestRoute) {
+      // Allow guest routes for all authenticated users
+      return null;
     }
   }
 
