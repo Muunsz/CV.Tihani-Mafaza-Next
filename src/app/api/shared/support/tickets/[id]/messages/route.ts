@@ -21,14 +21,14 @@ export async function GET(
     });
 
     if (!ticket) {
-      throw new ApiError('NOT_FOUND', 'Ticket not found', 404);
+      throw new ApiError(404, 'Ticket not found', 'NOT_FOUND');
     }
 
     // Verify user has access
     if (ticket.user_id !== parseInt(userId || '0')) {
       const role = request.headers.get('x-user-role');
       if (role !== 'admin' && role !== 'staff') {
-        throw new ApiError('FORBIDDEN', 'Access denied', 403);
+        throw new ApiError(403, 'Access denied', 'FORBIDDEN');
       }
     }
 
@@ -66,7 +66,7 @@ export async function POST(
     const body = await request.json();
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     const { message_text, attachment_url, internal_note } = body;
@@ -85,14 +85,14 @@ export async function POST(
     });
 
     if (!ticket) {
-      throw new ApiError('NOT_FOUND', 'Ticket not found', 404);
+      throw new ApiError(404, 'Ticket not found', 'NOT_FOUND');
     }
 
     // Verify user has access
     if (ticket.user_id !== parseInt(userId)) {
       const role = request.headers.get('x-user-role');
       if (role !== 'admin' && role !== 'staff') {
-        throw new ApiError('FORBIDDEN', 'Access denied', 403);
+        throw new ApiError(403, 'Access denied', 'FORBIDDEN');
       }
     }
 

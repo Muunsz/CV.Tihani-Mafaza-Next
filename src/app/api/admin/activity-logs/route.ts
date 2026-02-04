@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const role = request.headers.get('x-user-role');
 
     if (role !== 'admin' && role !== 'staff') {
-      throw new ApiError('UNAUTHORIZED', 'Admin or staff access required', 403);
+      throw new ApiError(403, 'Admin or staff access required', 'UNAUTHORIZED');
     }
 
     const { searchParams } = new URL(request.url);
@@ -97,9 +97,9 @@ export async function POST(request: NextRequest) {
 
     if (!action || !entity_type) {
       throw new ApiError(
-        'VALIDATION_ERROR',
+        400,
         'Action and entity_type are required',
-        400
+        'VALIDATION_ERROR'
       );
     }
 

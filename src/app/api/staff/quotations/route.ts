@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (Object.keys(errors).length > 0) {
-      throw new ApiError('VALIDATION_ERROR', 'Validation failed', 400, errors);
+      throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR', errors);
     }
 
     // Calculate total amount
@@ -101,9 +101,9 @@ export async function POST(request: NextRequest) {
     for (const item of items) {
       if (!item.product_id || !item.quantity) {
         throw new ApiError(
-          'VALIDATION_ERROR',
+          400,
           'Each item must have product_id and quantity',
-          400
+          'VALIDATION_ERROR'
         );
       }
 
@@ -114,9 +114,9 @@ export async function POST(request: NextRequest) {
 
       if (!product) {
         throw new ApiError(
-          'NOT_FOUND',
+          404,
           `Product ${item.product_id} not found`,
-          404
+          'NOT_FOUND'
         );
       }
 

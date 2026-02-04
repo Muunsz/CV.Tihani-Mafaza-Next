@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { COLORS } from "@/lib/constants";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import {
   ShoppingCart,
   Heart,
@@ -19,6 +21,7 @@ import {
   CheckCircle,
   AlertCircle,
   Download,
+  LogOut,
 } from "lucide-react";
 
 // Mock data untuk orders
@@ -165,6 +168,42 @@ function StatusBadge({
 function CustomerDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!session) {
+      router.push("/guest/auth/login");
+      return;
+    }
+    if (session.user?.role !== "customer") {
+      // Redirect to appropriate dashboard
+      if (session.user?.role === "admin") {
+        router.push("/admin/dashboard");
+      } else if (session.user?.role === "staff") {
+        router.push("/staff/dashboard");
+      } else {
+        router.push("/guest");
+      }
+    }
+  }, [session, status, router]);
+
+  const handleLogout = async () => {
+    await signOut({ redirect: true, callbackUrl: "/guest/auth/login" });
+  };
+
+  if (status === "loading") {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (!session || session.user?.role !== "customer") {
+    return null;
+  }
 
   const filteredProducts = featuredProducts.filter((product) => {
     const matchesSearch = product.name
@@ -191,6 +230,18 @@ function CustomerDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* Header with Logout */}
+        <div className="flex justify-between items-center">
+          <div></div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-red-50 transition border border-gray-300"
+          >
+            <LogOut size={18} />
+            <span>Keluar</span>
+          </button>
+        </div>
+
         {/* Header Welcome Section */}
         <div
           className="rounded-lg p-8 text-white"
@@ -303,7 +354,10 @@ function CustomerDashboard() {
                         {item.name}
                       </p>
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-bold" style={{ color: COLORS.accent }}>
+                        <p
+                          className="text-sm font-bold"
+                          style={{ color: COLORS.accent }}
+                        >
                           {formatPrice(item.price)}
                         </p>
                         <button
@@ -335,9 +389,11 @@ function CustomerDashboard() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition"
-                  style={{
-                    "--tw-ring-color": COLORS.accent,
-                  } as React.CSSProperties}
+                  style={
+                    {
+                      "--tw-ring-color": COLORS.accent,
+                    } as React.CSSProperties
+                  }
                 />
               </div>
 
@@ -400,7 +456,10 @@ function CustomerDashboard() {
 
                     {/* Rating */}
                     <div className="flex items-center gap-1 mt-2">
-                      <Star size={16} className="fill-yellow-400 text-yellow-400" />
+                      <Star
+                        size={16}
+                        className="fill-yellow-400 text-yellow-400"
+                      />
                       <span className="text-sm font-semibold text-gray-900">
                         {product.rating}
                       </span>

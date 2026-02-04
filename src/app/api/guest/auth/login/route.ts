@@ -19,12 +19,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      throw new ApiError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+      throw new ApiError(401, 'Invalid email or password', 'INVALID_CREDENTIALS');
     }
 
     // Check if user is active
     if (!user.is_active) {
-      throw new ApiError('Account is inactive', 403, 'ACCOUNT_INACTIVE');
+      throw new ApiError(403, 'Account is inactive', 'ACCOUNT_INACTIVE');
     }
 
     // Verify password
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (!isPasswordValid) {
-      throw new ApiError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+      throw new ApiError(401, 'Invalid email or password', 'INVALID_CREDENTIALS');
     }
 
     // Update last login

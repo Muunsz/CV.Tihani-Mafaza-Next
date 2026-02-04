@@ -12,6 +12,36 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    console.log("[LOGOUT] Starting logout process");
+
+    try {
+      // Clear local storage/session storage
+      if (typeof window !== "undefined") {
+        localStorage.clear();
+        sessionStorage.clear();
+      }
+
+      // Call NextAuth signOut with redirect
+      await signOut({
+        callbackUrl: "/",
+        redirect: true,
+      });
+
+      console.log("[LOGOUT] SignOut initiated successfully");
+    } catch (error) {
+      console.error("[LOGOUT] Error during logout:", error);
+      // Force redirect to home even if logout fails
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      }
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,29 +71,77 @@ export function Navbar() {
           </button>
 
           {/* Logo - Center/Left */}
-          <Link
-            href="/"
-            className="flex items-center gap-2 flex-shrink-0 flex-1 lg:flex-none"
-          >
-            <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-              <Image
-                src="/images/LogoNoBg.png"
-                alt="CV. Tihani Mafaza"
-                width={40}
-                height={40}
-                className="object-contain"
-              />
-            </div>
-            <div className="hidden sm:block">
-              <p
-                className="font-bold text-gray-900 text-sm"
-                style={{ color: COLORS.primary }}
-              >
-                {COMPANY.name}
-              </p>
-              <p className="text-xs text-gray-500">{COMPANY.tagline}</p>
-            </div>
-          </Link>
+          <div className="flex items-center gap-2 flex-shrink-0 flex-1 lg:flex-none relative">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                <Image
+                  src="/images/LogoNoBg.png"
+                  alt="CV. Tihani Mafaza"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
+              </div>
+              <div className="hidden sm:block">
+                <p
+                  className="font-bold text-gray-900 text-sm"
+                  style={{ color: COLORS.primary }}
+                >
+                  {COMPANY.name}
+                </p>
+                <p className="text-xs text-gray-500">{COMPANY.tagline}</p>
+              </div>
+            </Link>
+
+            {/* Mobile Logo Dropdown */}
+            {session && (
+              <div className="lg:hidden relative">
+                <button
+                  onClick={() =>
+                    setExpandedMenu(expandedMenu === "logo" ? null : "logo")
+                  }
+                  className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 transition focus:outline-none ml-2"
+                >
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                </button>
+                {expandedMenu === "logo" && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <Link
+                      href={
+                        session.user?.role === "admin" ||
+                        session.user?.role === "staff"
+                          ? "/admin/dashboard"
+                          : session.user?.role === "customer"
+                            ? "/customer/dashboard"
+                            : "/profile"
+                      }
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg"
+                      onClick={() => setExpandedMenu(null)}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      href="/customer/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setExpandedMenu(null)}
+                    >
+                      Profil
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setExpandedMenu(null);
+                        handleLogout();
+                      }}
+                      disabled={isLoggingOut}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isLoggingOut ? "Keluar..." : "Keluar"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-1">
@@ -121,8 +199,8 @@ export function Navbar() {
                       session.user?.role === "staff"
                         ? "/admin/dashboard"
                         : session.user?.role === "customer"
-                        ? "/customer/dashboard"
-                        : "/profile"
+                          ? "/customer/dashboard"
+                          : "/profile"
                     }
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg"
                   >
@@ -135,10 +213,11 @@ export function Navbar() {
                     Profil
                   </Link>
                   <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Keluar
+                    {isLoggingOut ? "Keluar..." : "Keluar"}
                   </button>
                 </div>
               </div>
@@ -162,22 +241,68 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile Auth Buttons - Right */}
+          {/* Mobile Auth Buttons/Profile - Right */}
           <div className="md:hidden flex items-center gap-1 order-last">
-            <Link
-              href="/guest/auth/login"
-              className="px-3 py-2 rounded-lg font-semibold text-sm transition hover:bg-gray-100 border border-gray-200"
-              style={{ color: COLORS.accent }}
-            >
-              Masuk
-            </Link>
-            <Link
-              href="/guest/auth/register"
-              className="px-3 py-2 rounded-lg text-white font-semibold text-sm transition hover:opacity-90"
-              style={{ backgroundColor: COLORS.accent }}
-            >
-              Daftar
-            </Link>
+            {session ? (
+              <div className="relative group">
+                <button className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 hover:bg-gray-100 transition focus:outline-none">
+                  {session.user?.image ? (
+                    <img
+                      src={session.user.image}
+                      alt="Avatar"
+                      className="w-10 h-10 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <User className="w-6 h-6 text-gray-600" />
+                  )}
+                </button>
+                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <Link
+                    href={
+                      session.user?.role === "admin" ||
+                      session.user?.role === "staff"
+                        ? "/admin/dashboard"
+                        : session.user?.role === "customer"
+                          ? "/customer/dashboard"
+                          : "/profile"
+                    }
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/customer/profile"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Profil
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoggingOut ? "Keluar..." : "Keluar"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/guest/auth/login"
+                  className="px-3 py-2 rounded-lg font-semibold text-sm transition hover:bg-gray-100 border border-gray-200"
+                  style={{ color: COLORS.accent }}
+                >
+                  Masuk
+                </Link>
+                <Link
+                  href="/guest/auth/register"
+                  className="px-3 py-2 rounded-lg text-white font-semibold text-sm transition hover:opacity-90"
+                  style={{ backgroundColor: COLORS.accent }}
+                >
+                  Daftar
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
@@ -186,23 +311,31 @@ export function Navbar() {
           <div className="lg:hidden pb-4 space-y-2">
             {NAVIGATION.map((item) => (
               <div key={item.label}>
-                <button
-                  onClick={() =>
-                    setExpandedMenu(
-                      expandedMenu === item.label ? null : item.label,
-                    )
-                  }
-                  className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 flex justify-between items-center"
-                >
-                  {item.label}
-                  {item.submenu && (
+                {item.submenu ? (
+                  <button
+                    onClick={() =>
+                      setExpandedMenu(
+                        expandedMenu === item.label ? null : item.label,
+                      )
+                    }
+                    className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 flex justify-between items-center"
+                  >
+                    {item.label}
                     <ChevronDown
                       className={`w-4 h-4 transition ${
                         expandedMenu === item.label ? "rotate-180" : ""
                       }`}
                     />
-                  )}
-                </button>
+                  </button>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                )}
 
                 {/* Mobile Submenu */}
                 {item.submenu && expandedMenu === item.label && (
@@ -256,11 +389,12 @@ export function Navbar() {
                     <button
                       onClick={() => {
                         setIsOpen(false);
-                        signOut({ callbackUrl: "/" });
+                        handleLogout();
                       }}
-                      className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
+                      disabled={isLoggingOut}
+                      className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Keluar
+                      {isLoggingOut ? "Keluar..." : "Keluar"}
                     </button>
                   </div>
                 </div>

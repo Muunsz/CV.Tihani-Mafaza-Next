@@ -19,7 +19,7 @@ export async function POST(
     const { assigned_to, priority } = body;
 
     if (role !== 'admin' && role !== 'staff') {
-      throw new ApiError('UNAUTHORIZED', 'Admin or staff access required', 403);
+      throw new ApiError(403, 'Admin or staff access required', 'UNAUTHORIZED');
     }
 
     // Get ticket
@@ -28,7 +28,7 @@ export async function POST(
     });
 
     if (!ticket) {
-      throw new ApiError('NOT_FOUND', 'Ticket not found', 404);
+      throw new ApiError(404, 'Ticket not found', 'NOT_FOUND');
     }
 
     // Verify assigned user is staff

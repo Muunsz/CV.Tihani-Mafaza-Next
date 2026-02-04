@@ -17,7 +17,7 @@ export async function GET(
     const userId = request.headers.get('x-user-id');
 
     if (!userId) {
-      throw new ApiError('Unauthorized', 401, 'UNAUTHORIZED');
+      throw new ApiError(401, 'Unauthorized', 'UNAUTHORIZED');
     }
 
     const ticket = await prisma.support_tickets.findUnique({
@@ -46,12 +46,12 @@ export async function GET(
     });
 
     if (!ticket) {
-      throw new ApiError('Ticket not found', 404, 'NOT_FOUND');
+      throw new ApiError(404, 'Ticket not found', 'NOT_FOUND');
     }
 
     // Verify ownership
     if (ticket.user_id !== parseInt(userId)) {
-      throw new ApiError('Forbidden', 403, 'FORBIDDEN');
+      throw new ApiError(403, 'Forbidden', 'FORBIDDEN');
     }
 
     return ApiResponse.success(ticket, 200);
@@ -69,7 +69,7 @@ export async function POST(
     const userId = request.headers.get('x-user-id');
 
     if (!userId) {
-      throw new ApiError('Unauthorized', 401, 'UNAUTHORIZED');
+      throw new ApiError(401, 'Unauthorized', 'UNAUTHORIZED');
     }
 
     // Verify ticket exists and ownership
@@ -78,11 +78,11 @@ export async function POST(
     });
 
     if (!ticket) {
-      throw new ApiError('Ticket not found', 404, 'NOT_FOUND');
+      throw new ApiError(404, 'Ticket not found', 'NOT_FOUND');
     }
 
     if (ticket.user_id !== parseInt(userId)) {
-      throw new ApiError('Forbidden', 403, 'FORBIDDEN');
+      throw new ApiError(403, 'Forbidden', 'FORBIDDEN');
     }
 
     const body = await request.json();

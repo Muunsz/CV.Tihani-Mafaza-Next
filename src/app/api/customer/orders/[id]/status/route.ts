@@ -17,9 +17,10 @@ const VALID_STATUSES = [
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const role = request.headers.get('x-user-role');
     const userId = request.headers.get('x-user-id');
     const body = await request.json();

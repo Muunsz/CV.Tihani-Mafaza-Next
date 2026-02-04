@@ -18,7 +18,7 @@ interface ClientProviderProps {
 export function ClientProvider({ children }: ClientProviderProps) {
   return (
     <SessionProvider basePath="/api/guest/auth">
-      <HeroUIProvider>{children}</HeroUIProvider>
+      <HeroUIProvider disableAnimation={false}>{children}</HeroUIProvider>
     </SessionProvider>
   );
 }

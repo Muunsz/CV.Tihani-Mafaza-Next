@@ -12,23 +12,20 @@ export default function AuthRedirect() {
     if (status === "loading") return;
 
     if (session?.user) {
-      // Fetch user role and redirect
-      fetch("/api/auth/user-role")
-        .then((res) => res.json())
-        .then((userData) => {
-          if (userData.role === "admin") {
-            router.push("/admin/dashboard");
-          } else if (userData.role === "staff") {
-            router.push("/admin/staff");
-          } else {
-            router.push("/profile");
-          }
-        })
-        .catch(() => {
-          router.push("/profile"); // fallback
-        });
+      // Get user role from NextAuth session and redirect
+      const role = (session.user as any)?.role || "customer";
+
+      if (role === "admin") {
+        router.push("/admin/dashboard");
+      } else if (role === "staff") {
+        router.push("/staff/dashboard");
+      } else if (role === "customer") {
+        router.push("/customer/dashboard");
+      } else {
+        router.push("/guest/dashboard");
+      }
     } else {
-      router.push("/auth/login");
+      router.push("/guest/auth/login");
     }
   }, [session, status, router]);
 

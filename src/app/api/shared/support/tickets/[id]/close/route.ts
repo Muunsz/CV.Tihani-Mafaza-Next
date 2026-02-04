@@ -24,7 +24,7 @@ export async function POST(
     });
 
     if (!ticket) {
-      throw new ApiError('NOT_FOUND', 'Ticket not found', 404);
+      throw new ApiError(404, 'Ticket not found', 'NOT_FOUND');
     }
 
     // Check authorization
@@ -33,7 +33,7 @@ export async function POST(
       role !== 'staff' &&
       ticket.user_id !== parseInt(userId || '0')
     ) {
-      throw new ApiError('FORBIDDEN', 'Cannot close this ticket', 403);
+      throw new ApiError(403, 'Cannot close this ticket', 'FORBIDDEN');
     }
 
     // Update ticket

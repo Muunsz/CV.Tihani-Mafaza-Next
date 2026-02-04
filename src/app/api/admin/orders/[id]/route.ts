@@ -13,7 +13,7 @@ const updateOrderSchema = z.object({
 
 async function verifyAdminAccess(userId: string | null) {
   if (!userId) {
-    throw new ApiError('Unauthorized', 401, 'UNAUTHORIZED');
+    throw new ApiError(401, 'Unauthorized', 'UNAUTHORIZED');
   }
 
   const user = await prisma.users.findUnique({

@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const role = request.headers.get('x-user-role');
 
     if (role !== 'admin') {
-      throw new ApiError('UNAUTHORIZED', 'Admin access required', 403);
+      throw new ApiError(403, 'Admin access required', 'UNAUTHORIZED');
     }
 
     const body = await request.json();
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (Object.keys(errors).length > 0) {
-      throw new ApiError('VALIDATION_ERROR', 'Validation failed', 400, errors);
+      throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR', errors);
     }
 
     let faq;
@@ -75,11 +75,11 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get('id');
 
     if (role !== 'admin') {
-      throw new ApiError('UNAUTHORIZED', 'Admin access required', 403);
+      throw new ApiError(403, 'Admin access required', 'UNAUTHORIZED');
     }
 
     if (!id) {
-      throw new ApiError('VALIDATION_ERROR', 'FAQ ID is required', 400);
+      throw new ApiError(400, 'FAQ ID is required', 'VALIDATION_ERROR');
     }
 
     await prisma.faq.delete({

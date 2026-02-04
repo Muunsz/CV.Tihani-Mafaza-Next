@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const userId = request.headers.get('x-user-id');
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     const { searchParams } = new URL(request.url);
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     const { notification_ids } = body;
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     if (!Array.isArray(notification_ids) || notification_ids.length === 0) {
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (notifications.length === 0) {
-      throw new ApiError('NOT_FOUND', 'Notifications not found', 404);
+      throw new ApiError(404, 'Notifications not found', 'NOT_FOUND');
     }
 
     // Mark as read

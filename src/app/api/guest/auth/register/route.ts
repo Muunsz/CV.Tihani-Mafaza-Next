@@ -3,11 +3,11 @@ import { prisma } from '@/lib/prisma';
 import { ApiResponse, handleError } from '@/lib/api/response';
 import { ApiError } from '@/lib/api/errors';
 import { registerSchema } from '@/lib/validations';
-import { createHash } from 'crypto';
+import bcrypt from 'bcryptjs';
 
-// Simple password hashing function (use SHA256 for development)
+// Password hashing function using bcrypt
 function hashPassword(password: string): string {
-  return createHash('sha256').update(password).digest('hex');
+  return bcrypt.hashSync(password, 12);
 }
 
 export async function POST(request: NextRequest) {
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser) {
-      throw new ApiError('Email already registered', 409, 'EMAIL_EXISTS');
+      throw new ApiError(409, 'Email already registered', 'EMAIL_EXISTS');
     }
 
     // Hash password

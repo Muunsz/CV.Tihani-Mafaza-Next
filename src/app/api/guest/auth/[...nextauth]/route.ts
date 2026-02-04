@@ -3,21 +3,14 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
+import bcrypt from "bcryptjs"
 
-
-
-// Simple password comparison function (Edge Runtime compatible)
+// Password comparison function using bcrypt
 async function comparePasswords(plain: string, hashed: string) {
   try {
-    // Use Web Crypto API for SHA-256 hashing
-    const encoder = new TextEncoder();
-    const data = encoder.encode(plain);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashHex = Array.from(new Uint8Array(hashBuffer))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-    return hashHex === hashed;
-  } catch {
+    return await bcrypt.compare(plain, hashed);
+  } catch (error) {
+    console.error("[AUTH] Password comparison error:", error);
     return false;
   }
 }
@@ -28,21 +21,11 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   basePath: "/api/guest/auth",
   secret: process.env.NEXTAUTH_SECRET,
+  trustHost: true,
   session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // 24 hours
-  },
-  cookies: {
-    sessionToken: {
-      name: isDevelopment ? `next-auth.session-token` : `__Secure-next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: !isDevelopment,
-      },
-    },
+    strategy: "jwt" as const,
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
   },
   providers: [
     GoogleProvider({
@@ -56,37 +39,52 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          console.log("[AUTH] Email/password kosong");
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            console.log("[AUTH] Email or password missing");
+            return null;
+          }
+
+          const user = await prisma.users.findUnique({
+            where: { email: credentials.email },
+            include: { roles: true }
+          });
+
+          if (!user || !user.password_hash) {
+            console.log("[AUTH] User not found or password_hash missing");
+            return null;
+          }
+
+          // Check if user is active
+          if (!user.is_active) {
+            console.log("[AUTH] User is inactive");
+            return null;
+          }
+
+          const isPasswordValid = await comparePasswords(credentials.password, user.password_hash);
+
+          if (!isPasswordValid) {
+            console.log("[AUTH] Invalid password");
+            return null;
+          }
+
+          // Update last login
+          await prisma.users.update({
+            where: { id: user.id },
+            data: { last_login: new Date() }
+          });
+
+          return {
+            id: user.id.toString(),
+            email: user.email,
+            name: user.full_name,
+            image: user.avatar_url,
+            role: user.roles?.name || 'guest',
+          };
+        } catch (error) {
+          console.error("[AUTH] Authorize error:", error);
           return null;
         }
-
-        const user = await prisma.users.findUnique({
-          where: { email: credentials.email },
-          include: { roles: true }
-        });
-        console.log("[AUTH] User found:", user);
-
-        if (!user || !user.password_hash) {
-          console.log("[AUTH] User tidak ditemukan atau password_hash kosong");
-          return null;
-        }
-
-        const isPasswordValid = await comparePasswords(credentials.password, user.password_hash);
-        console.log("[AUTH] Password valid:", isPasswordValid);
-
-        if (!isPasswordValid) {
-          console.log("[AUTH] Password tidak cocok");
-          return null;
-        }
-
-        return {
-          id: user.id.toString(),
-          email: user.email,
-          name: user.full_name,
-          image: user.avatar_url,
-          role: user.roles.name,
-        };
       }
     })
   ],
@@ -96,8 +94,8 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider === 'google') {
-        try {
+      try {
+        if (account?.provider === 'google') {
           // Check if user exists
           const existingUser = await prisma.users.findUnique({
             where: { email: user.email! },
@@ -105,57 +103,86 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
           });
 
           if (!existingUser) {
-            // Get customer role
-            const customerRole = await prisma.roles.findUnique({
+            // Get or create customer role
+            let customerRole = await prisma.roles.findUnique({
               where: { name: 'customer' }
             });
 
             if (!customerRole) {
-              console.error('Customer role not found');
-              return false;
+              customerRole = await prisma.roles.create({
+                data: {
+                  name: 'customer',
+                  description: 'Customer role'
+                }
+              });
             }
 
-            // Create new user
+            // Create new user from Google
             await prisma.users.create({
               data: {
                 email: user.email!,
-                full_name: user.name!,
+                full_name: user.name || user.email!.split('@')[0],
                 avatar_url: user.image,
                 role_id: customerRole.id,
                 is_active: true,
                 email_verified: true,
+                password_hash: '', // No password for OAuth users
+              }
+            });
+
+            console.log("[AUTH] New Google user created:", user.email);
+          } else {
+            // Update user if needed
+            await prisma.users.update({
+              where: { id: existingUser.id },
+              data: {
+                avatar_url: user.image || existingUser.avatar_url,
+                is_active: true,
               }
             });
           }
 
           return true;
-        } catch (error) {
-          console.error('Error handling Google sign in:', error);
-          return false;
         }
-      }
 
-      return true;
+        return true;
+      } catch (error) {
+        console.error('[AUTH] SignIn callback error:', error);
+        return false;
+      }
     },
     async jwt({ token, user }) {
-      if (user) {
-        // Get user from database to include role
-        const dbUser = await prisma.users.findUnique({
-          where: { email: user.email! },
-          include: { roles: true }
-        });
+      try {
+        if (user) {
+          token.id = user.id;
+          token.role = user.role;
+          token.email = user.email;
+        } else if (token.email) {
+          // For subsequent requests, fetch fresh user data
+          const dbUser = await prisma.users.findUnique({
+            where: { email: token.email },
+            include: { roles: true }
+          });
 
-        if (dbUser) {
-          token.id = dbUser.id.toString();
-          token.role = dbUser.roles.name;
+          if (dbUser) {
+            token.id = dbUser.id.toString();
+            token.role = dbUser.roles?.name || 'guest';
+          }
         }
+      } catch (error) {
+        console.error("[AUTH] JWT callback error:", error);
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
+      try {
+        if (session.user) {
+          session.user.id = token.id as string;
+          session.user.role = token.role as string;
+          session.user.email = token.email as string;
+        }
+      } catch (error) {
+        console.error("[AUTH] Session callback error:", error);
       }
       return session;
     },
@@ -188,6 +215,16 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
       }
 
       return `${baseUrl}`;
+    },
+  },
+  events: {
+    async signOut({ token }) {
+      try {
+        console.log("[AUTH_EVENTS] User signed out:", token?.email);
+        // Clear any additional data if needed
+      } catch (error) {
+        console.error("[AUTH_EVENTS] SignOut error:", error);
+      }
     },
   },
 })

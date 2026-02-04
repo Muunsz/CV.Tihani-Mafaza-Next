@@ -72,27 +72,31 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
         redirect: false,
       });
 
+      console.log("[LOGIN] Sign in result:", result);
+
       if (result?.error) {
         setError("Email atau password salah");
-      } else {
-        // Redirect to dashboard sesuai role
-        const res = await fetch("/api/guest/auth/session");
-        const data = await res.json();
-        if (data?.user?.role === "admin") {
-          window.location.href = "/admin/dashboard";
-        } else if (data?.user?.role === "staff") {
-          window.location.href = "/staff/dashboard";
-        } else if (data?.user?.role === "customer") {
-          window.location.href = "/customer/dashboard";
-        } else if (data?.user?.role === "guest") {
-          window.location.href = "/guest/dashboard";
-        } else {
-          window.location.href = "/profile";
-        }
+        setIsLoading(false);
+      } else if (result?.ok) {
+        // Wait a moment for session to be established
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // Get user role from NextAuth session
+        const role = result?.user?.role || "customer";
+        const redirectUrl =
+          role === "admin"
+            ? "/admin/dashboard"
+            : role === "staff"
+              ? "/staff/dashboard"
+              : role === "customer"
+                ? "/customer/dashboard"
+                : "/guest/dashboard";
+
+        window.location.href = redirectUrl;
       }
     } catch (err: any) {
+      console.error("[LOGIN] SignIn error:", err);
       setError(err.message || "Terjadi kesalahan saat masuk");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -100,33 +104,40 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
+      console.log("[GOOGLE_LOGIN] Starting Google sign in");
+
       const result = await signIn("google", {
         redirect: false,
+        callbackUrl: "/auth/redirect",
       });
+
+      console.log("[GOOGLE_LOGIN] Google sign in result:", result);
 
       if (result?.error) {
         setError("Gagal login dengan Google. Silakan coba lagi.");
-        console.error("Google sign in error:", result.error);
+        console.error("[GOOGLE_LOGIN] Error:", result.error);
+        setGoogleLoading(false);
       } else if (result?.ok) {
-        // Wait for session to be set, then redirect based on role
-        setTimeout(async () => {
-          const res = await fetch("/api/guest/auth/session");
-          const data = await res.json();
-          if (data?.user?.role === "admin") {
-            window.location.href = "/admin/dashboard";
-          } else if (data?.user?.role === "staff") {
-            window.location.href = "/staff/dashboard";
-          } else if (data?.user?.role === "customer") {
-            window.location.href = "/customer/dashboard";
-          } else {
-            window.location.href = "/profile";
-          }
-        }, 500);
+        // Wait for session to be established
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // Get user role from NextAuth session
+        const role = result?.user?.role || "customer";
+        const redirectUrl =
+          role === "admin"
+            ? "/admin/dashboard"
+            : role === "staff"
+              ? "/staff/dashboard"
+              : role === "customer"
+                ? "/customer/dashboard"
+                : "/guest/dashboard";
+
+        console.log("[GOOGLE_LOGIN] Redirecting to:", redirectUrl);
+        window.location.href = redirectUrl;
       }
     } catch (error: any) {
+      console.error("[GOOGLE_LOGIN] Unexpected error:", error);
       setError("Gagal login dengan Google. Silakan coba lagi.");
-      console.error("Google sign in error:", error);
-    } finally {
       setGoogleLoading(false);
     }
   };

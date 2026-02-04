@@ -1,9 +1,17 @@
-'use client';
+"use client";
 
-import { COLORS, CONTACT } from '@/lib/constants';
-import { Bell, Search, User, MessageSquare, LogOut, Smartphone, Monitor } from 'lucide-react';
-import { signOut } from 'next-auth/react';
-import { useState } from 'react';
+import { COLORS, CONTACT } from "@/lib/constants";
+import {
+  Bell,
+  Search,
+  User,
+  MessageSquare,
+  LogOut,
+  Smartphone,
+  Monitor,
+} from "lucide-react";
+import { signOut } from "next-auth/react";
+import { useState } from "react";
 
 interface AdminHeaderProps {
   title: string;
@@ -15,13 +23,13 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
   const [isMobileView, setIsMobileView] = useState(false);
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: '/' });
+    await signOut({ redirect: true, callbackUrl: "/guest/auth/login" });
   };
 
   return (
     <div
       className="border-b sticky top-0 z-40"
-      style={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb' }}
+      style={{ backgroundColor: "#ffffff", borderColor: "#e5e7eb" }}
     >
       <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         {/* Title Section */}
@@ -32,9 +40,7 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
           >
             {title}
           </h1>
-          {subtitle && (
-            <p className="text-gray-600 text-sm mt-1">{subtitle}</p>
-          )}
+          {subtitle && <p className="text-gray-600 text-sm mt-1">{subtitle}</p>}
         </div>
 
         {/* Right Actions */}

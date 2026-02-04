@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const userId = request.headers.get('x-user-id');
 
     if (!userId) {
-      throw new ApiError('Unauthorized', 401, 'UNAUTHORIZED');
+      throw new ApiError(401, 'Unauthorized', 'UNAUTHORIZED');
     }
 
     const tickets = await prisma.support_tickets.findMany({
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const userId = request.headers.get('x-user-id');
 
     if (!userId) {
-      throw new ApiError('Unauthorized', 401, 'UNAUTHORIZED');
+      throw new ApiError(401, 'Unauthorized', 'UNAUTHORIZED');
     }
 
     const body = await request.json();
