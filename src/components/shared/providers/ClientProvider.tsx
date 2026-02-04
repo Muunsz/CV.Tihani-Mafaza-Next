@@ -3,6 +3,7 @@
 import React from "react";
 import { HeroUIProvider } from "@heroui/react";
 import { SessionProvider } from "next-auth/react";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 /**
  * Client Provider Wrapper
@@ -18,7 +19,9 @@ interface ClientProviderProps {
 export function ClientProvider({ children }: ClientProviderProps) {
   return (
     <SessionProvider basePath="/api/guest/auth">
-      <HeroUIProvider disableAnimation={false}>{children}</HeroUIProvider>
+      <AuthProvider>
+        <HeroUIProvider disableAnimation={false}>{children}</HeroUIProvider>
+      </AuthProvider>
     </SessionProvider>
   );
 }
