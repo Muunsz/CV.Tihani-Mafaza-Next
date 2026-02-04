@@ -78,21 +78,26 @@ export function CustomerSidebar({ isOpen = true, onClose }: CustomerSidebarProps
   };
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
+    console.log("[CUSTOMER_LOGOUT] Starting logout process");
+    
     try {
-      setIsLoggingOut(true);
-      console.log("[CUSTOMER_LOGOUT] Starting logout process");
-      
-      await signOut({
-        redirect: true,
-        callbackUrl: "/",
+      // Call signOut without redirect - we'll handle redirect manually
+      await signOut({ 
+        redirect: false 
       });
       
-      console.log("[CUSTOMER_LOGOUT] Logout completed");
+      console.log("[CUSTOMER_LOGOUT] SignOut successful, redirecting...");
+      
+      // Small delay to ensure session is cleared
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Redirect to home
+      window.location.href = "/";
     } catch (error) {
       console.error("[CUSTOMER_LOGOUT] Error during logout:", error);
+      // Force redirect anyway
       window.location.href = "/";
-    } finally {
-      setIsLoggingOut(false);
     }
   };
 

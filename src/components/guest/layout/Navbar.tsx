@@ -15,22 +15,26 @@ export function Navbar() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
+    console.log("[LOGOUT] Starting logout process");
+    
     try {
-      setIsLoggingOut(true);
-      console.log("[LOGOUT] Starting logout process");
-      
-      const result = await signOut({
-        redirect: true,
-        callbackUrl: "/",
+      // Call signOut without redirect - we'll handle redirect manually
+      await signOut({ 
+        redirect: false 
       });
       
-      console.log("[LOGOUT] SignOut result:", result);
+      console.log("[LOGOUT] SignOut successful, redirecting...");
+      
+      // Small delay to ensure session is cleared
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Redirect to home
+      window.location.href = "/";
     } catch (error) {
       console.error("[LOGOUT] Error during logout:", error);
-      // Force redirect even if signOut fails
+      // Force redirect anyway
       window.location.href = "/";
-    } finally {
-      setIsLoggingOut(false);
     }
   };
 
