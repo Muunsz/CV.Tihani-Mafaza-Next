@@ -27,6 +27,17 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
     maxAge: 30 * 24 * 60 * 60,
     updateAge: 24 * 60 * 60,
   },
+  cookies: {
+    sessionToken: {
+      name: isDevelopment ? `next-auth.session-token` : `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: !isDevelopment,
+      },
+    },
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -215,6 +226,16 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
       }
 
       return `${baseUrl}`;
+    },
+  },
+  events: {
+    async signOut({ token }) {
+      try {
+        console.log("[AUTH_EVENTS] User signed out:", token?.email);
+        // Clear any additional data if needed
+      } catch (error) {
+        console.error("[AUTH_EVENTS] SignOut error:", error);
+      }
     },
   },
 })
