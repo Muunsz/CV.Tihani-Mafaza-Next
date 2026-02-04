@@ -27,17 +27,17 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
   // Auto-redirect if already logged in
   useEffect(() => {
     if (status === "authenticated" && session?.user?.role) {
-      if (session.user.role === "admin") {
-        router.replace("/admin/dashboard");
-      } else if (session.user.role === "staff") {
-        router.replace("/staff/dashboard");
-      } else if (session.user.role === "customer") {
-        router.replace("/customer/dashboard");
-      } else if (session.user.role === "guest") {
-        router.replace("/guest/dashboard");
-      } else {
-        router.replace("/profile");
-      }
+      const role = session.user.role as string;
+      
+      const redirectMap: Record<string, string> = {
+        admin: "/admin/dashboard",
+        staff: "/staff/dashboard",
+        customer: "/customer/dashboard",
+        guest: "/guest/dashboard",
+      };
+
+      const redirectUrl = redirectMap[role] || "/";
+      router.replace(redirectUrl);
     }
   }, [status, session, router]);
 
@@ -66,37 +66,18 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
 
     setIsLoading(true);
     try {
+      // Use NextAuth redirect callback by letting signIn handle the redirect
       const result = await signIn("credentials", {
         email,
         password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: "/guest/auth/redirect",
       });
 
       console.log("[LOGIN] Sign in result:", result);
-
-      if (result?.error) {
-        setError("Email atau password salah");
-        setIsLoading(false);
-      } else if (result?.ok) {
-        // Wait a moment for session to be established
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        // Get user role from NextAuth session
-        const role = result?.user?.role || "customer";
-        const redirectUrl =
-          role === "admin"
-            ? "/admin/dashboard"
-            : role === "staff"
-              ? "/staff/dashboard"
-              : role === "customer"
-                ? "/customer/dashboard"
-                : "/guest/dashboard";
-
-        window.location.href = redirectUrl;
-      }
     } catch (err: any) {
       console.error("[LOGIN] SignIn error:", err);
-      setError(err.message || "Terjadi kesalahan saat masuk");
+      setError("Email atau password salah");
       setIsLoading(false);
     }
   };
@@ -106,35 +87,13 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
     try {
       console.log("[GOOGLE_LOGIN] Starting Google sign in");
 
+      // Use NextAuth redirect callback by letting signIn handle the redirect
       const result = await signIn("google", {
-        redirect: false,
-        callbackUrl: "/auth/redirect",
+        redirect: true,
+        callbackUrl: "/guest/auth/redirect",
       });
 
       console.log("[GOOGLE_LOGIN] Google sign in result:", result);
-
-      if (result?.error) {
-        setError("Gagal login dengan Google. Silakan coba lagi.");
-        console.error("[GOOGLE_LOGIN] Error:", result.error);
-        setGoogleLoading(false);
-      } else if (result?.ok) {
-        // Wait for session to be established
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Get user role from NextAuth session
-        const role = result?.user?.role || "customer";
-        const redirectUrl =
-          role === "admin"
-            ? "/admin/dashboard"
-            : role === "staff"
-              ? "/staff/dashboard"
-              : role === "customer"
-                ? "/customer/dashboard"
-                : "/guest/dashboard";
-
-        console.log("[GOOGLE_LOGIN] Redirecting to:", redirectUrl);
-        window.location.href = redirectUrl;
-      }
     } catch (error: any) {
       console.error("[GOOGLE_LOGIN] Unexpected error:", error);
       setError("Gagal login dengan Google. Silakan coba lagi.");
