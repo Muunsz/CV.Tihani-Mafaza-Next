@@ -75,6 +75,10 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
       });
 
       console.log("[LOGIN] Sign in result:", result);
+      // If signIn doesn't redirect (shouldn't happen with redirect: true),
+      // reset loading state and show error
+      setIsLoading(false);
+      setError("Terjadi kesalahan. Silakan coba lagi.");
     } catch (err: any) {
       console.error("[LOGIN] SignIn error:", err);
       setError("Email atau password salah");
@@ -94,6 +98,10 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
       });
 
       console.log("[GOOGLE_LOGIN] Google sign in result:", result);
+      // If signIn doesn't redirect (shouldn't happen with redirect: true),
+      // reset loading state and show error
+      setGoogleLoading(false);
+      setError("Terjadi kesalahan saat login dengan Google. Silakan coba lagi.");
     } catch (error: any) {
       console.error("[GOOGLE_LOGIN] Unexpected error:", error);
       setError("Gagal login dengan Google. Silakan coba lagi.");

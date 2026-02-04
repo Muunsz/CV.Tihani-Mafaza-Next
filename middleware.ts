@@ -1,38 +1,46 @@
 
-import { auth } from "@/lib/auth";
+import { auth } from "@/app/api/guest/auth/[...nextauth]/route";
 
 export default auth(async (req) => {
   const { pathname } = req.nextUrl;
 
-  // Protected routes that require authentication
+  // Routes that require authentication
   const adminRoutes = ["/admin"];
   const staffRoutes = ["/staff"];
   const customerRoutes = ["/customer", "/orders", "/cart", "/wishlist"];
-  const publicGuestRoutes = ["/guest"];
+  
+  // Public routes that do NOT require authentication
+  const publicRoutes = ["/guest/auth", "/guest/contact", "/"];
 
   const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
   const isStaffRoute = staffRoutes.some((route) => pathname.startsWith(route));
   const isCustomerRoute = customerRoutes.some((route) =>
     pathname.startsWith(route)
   );
-  const isPublicGuestRoute = publicGuestRoutes.some((route) =>
-    pathname.startsWith(route)
+  const isPublicRoute = publicRoutes.some((route) =>
+    pathname === route || pathname.startsWith(route)
   );
 
+  // Protected routes are those NOT in public routes
   const protectedRoutes = [
     ...adminRoutes,
     ...staffRoutes,
     ...customerRoutes,
-    ...publicGuestRoutes,
+    "/guest/dashboard", // Guest dashboard requires auth
   ];
 
   const isProtected = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
 
-  // Check authentication
+  // Check authentication for protected routes
   if (isProtected && !req.auth) {
     return Response.redirect(new URL("/guest/auth/login", req.url));
+  }
+
+  // Allow public routes to be accessed by anyone
+  if (isPublicRoute) {
+    return null;
   }
 
   // Role-based access control
@@ -79,9 +87,8 @@ export default auth(async (req) => {
       return null;
     }
 
-    // Guest routes
-    if (isPublicGuestRoute) {
-      // Allow guest routes for all authenticated users
+    // Guest dashboard - authenticated users can access
+    if (pathname.startsWith("/guest/dashboard")) {
       return null;
     }
   }
