@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     const { currentPassword, newPassword, confirmPassword } = body;
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (Object.keys(errors).length > 0) {
-      throw new ApiError('VALIDATION_ERROR', 'Validation failed', 400, errors);
+      throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR');
     }
 
     // Get current user
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      throw new ApiError('NOT_FOUND', 'User not found', 404);
+      throw new ApiError(404, 'User not found', 'NOT_FOUND');
     }
 
     // Verify current password
@@ -52,11 +52,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (!isPasswordValid) {
-      throw new ApiError(
-        'INVALID_CREDENTIALS',
-        'Current password is incorrect',
-        401
-      );
+      throw new ApiError(401, 'Current password is incorrect', 'INVALID_CREDENTIALS');
     }
 
     // Hash new password

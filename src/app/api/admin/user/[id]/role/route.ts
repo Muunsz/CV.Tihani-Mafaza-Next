@@ -18,11 +18,11 @@ export async function PUT(
     const { role_id } = body;
 
     if (adminRole !== 'admin') {
-      throw new ApiError('UNAUTHORIZED', 'Admin access required', 403);
+      throw new ApiError(403, 'Admin access required', 'UNAUTHORIZED');
     }
 
     if (!role_id) {
-      throw new ApiError('VALIDATION_ERROR', 'role_id is required', 400);
+      throw new ApiError(400, 'role_id is required', 'VALIDATION_ERROR');
     }
 
     const { id } = await params;
@@ -30,11 +30,11 @@ export async function PUT(
     // Get user
     const user = await prisma.users.findUnique({
       where: { id: parseInt(id) },
-      include: { role: true },
+      include: { roles: true },
     });
 
     if (!user) {
-      throw new ApiError('NOT_FOUND', 'User not found', 404);
+      throw new ApiError(404, 'User not found', 'NOT_FOUND');
     }
 
     // Verify role exists
@@ -43,23 +43,19 @@ export async function PUT(
     });
 
     if (!roleExists) {
-      throw new ApiError('NOT_FOUND', 'Role not found', 404);
+      throw new ApiError(404, 'Role not found', 'NOT_FOUND');
     }
 
     // Cannot change own role
-    if (parseInt(adminId || '0') === parseInt(params.id)) {
-      throw new ApiError(
-        'INVALID_REQUEST',
-        'Cannot change your own role',
-        400
-      );
+    if (parseInt(adminId || '0') === parseInt(id)) {
+      throw new ApiError(400, 'Cannot change your own role', 'INVALID_REQUEST');
     }
 
     // Update user role
     const updatedUser = await prisma.users.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: { role_id },
-      include: { role: true },
+      include: { roles: true },
     });
 
     // Log activity
@@ -68,8 +64,8 @@ export async function PUT(
         user_id: parseInt(adminId || '0'),
         action: 'UPDATE_USER_ROLE',
         entity_type: 'users',
-        entity_id: parseInt(params.id),
-        old_value: { role: user.role?.name },
+        entity_id: parseInt(id),
+        old_value: { role: user.roles?.name },
         new_value: { role: roleExists.name },
       },
     });

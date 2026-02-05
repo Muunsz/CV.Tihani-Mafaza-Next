@@ -1,10 +1,18 @@
-'use client';
+"use client";
 
-import React from "react"
+import React from "react";
 
-import { useState } from 'react';
-import { COLORS } from '@/lib/constants';
-import { User, Mail, Phone, Building2, MapPin, Save, AlertCircle } from 'lucide-react';
+import { useState } from "react";
+import { COLORS } from "@/lib/constants";
+import {
+  User,
+  Mail,
+  Phone,
+  Building2,
+  MapPin,
+  Save,
+  AlertCircle,
+} from "lucide-react";
 
 interface EditProfileFormProps {
   initialData?: {
@@ -17,23 +25,35 @@ interface EditProfileFormProps {
     province: string;
     postalCode: string;
   };
-  onSubmit?: (data: any) => void;
+  onSubmit?: (data: {
+    fullName: string;
+    email: string;
+    phone: string;
+    companyName: string;
+    address: string;
+    city: string;
+    province: string;
+    postalCode: string;
+  }) => void;
 }
 
-export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps) {
+export function EditProfileForm({
+  initialData,
+  onSubmit,
+}: EditProfileFormProps) {
   const [formData, setFormData] = useState(
     initialData || {
-      fullName: 'John Doe',
-      email: 'john@example.com',
-      phone: '+62 812 3456 7890',
-      companyName: 'PT Contoh Jaya',
-      address: 'Jl. Merdeka No. 123',
-      city: 'Bandung',
-      province: 'Jawa Barat',
-      postalCode: '40123',
-    }
+      fullName: "John Doe",
+      email: "john@example.com",
+      phone: "+62 812 3456 7890",
+      companyName: "PT Contoh Jaya",
+      address: "Jl. Merdeka No. 123",
+      city: "Bandung",
+      province: "Jawa Barat",
+      postalCode: "40123",
+    },
   );
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,11 +67,11 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setSuccess(false);
 
     if (!formData.fullName.trim()) {
-      setError('Nama lengkap harus diisi');
+      setError("Nama lengkap harus diisi");
       return;
     }
 
@@ -64,8 +84,8 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
         setSuccess(true);
         setIsLoading(false);
       }, 1000);
-    } catch (err) {
-      setError('Terjadi kesalahan saat menyimpan profil');
+    } catch {
+      setError("Terjadi kesalahan saat menyimpan profil");
       setIsLoading(false);
     }
   };
@@ -74,7 +94,7 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
         <div className="flex gap-3 p-4 rounded-lg bg-red-50 border border-red-200">
-          <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
+          <AlertCircle size={20} className="text-red-600 shrink-0 mt-0.5" />
           <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
@@ -88,7 +108,11 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
 
       {/* Full Name */}
       <div>
-        <label htmlFor="fullName" className="block text-sm font-semibold mb-2" style={{ color: COLORS.primary }}>
+        <label
+          htmlFor="fullName"
+          className="block text-sm font-semibold mb-2"
+          style={{ color: COLORS.primary }}
+        >
           Nama Lengkap
         </label>
         <div className="relative">
@@ -100,14 +124,18 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
             value={formData.fullName}
             onChange={handleChange}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition"
-            style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+            style={{ "--tw-ring-color": COLORS.accent } as React.CSSProperties}
           />
         </div>
       </div>
 
       {/* Email */}
       <div>
-        <label htmlFor="email" className="block text-sm font-semibold mb-2" style={{ color: COLORS.primary }}>
+        <label
+          htmlFor="email"
+          className="block text-sm font-semibold mb-2"
+          style={{ color: COLORS.primary }}
+        >
           Email
         </label>
         <div className="relative">
@@ -119,14 +147,18 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
             value={formData.email}
             onChange={handleChange}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition"
-            style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+            style={{ "--tw-ring-color": COLORS.accent } as React.CSSProperties}
           />
         </div>
       </div>
 
       {/* Phone */}
       <div>
-        <label htmlFor="phone" className="block text-sm font-semibold mb-2" style={{ color: COLORS.primary }}>
+        <label
+          htmlFor="phone"
+          className="block text-sm font-semibold mb-2"
+          style={{ color: COLORS.primary }}
+        >
           Nomor Telepon
         </label>
         <div className="relative">
@@ -138,18 +170,25 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
             value={formData.phone}
             onChange={handleChange}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition"
-            style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+            style={{ "--tw-ring-color": COLORS.accent } as React.CSSProperties}
           />
         </div>
       </div>
 
       {/* Company Name */}
       <div>
-        <label htmlFor="companyName" className="block text-sm font-semibold mb-2" style={{ color: COLORS.primary }}>
+        <label
+          htmlFor="companyName"
+          className="block text-sm font-semibold mb-2"
+          style={{ color: COLORS.primary }}
+        >
           Nama Perusahaan
         </label>
         <div className="relative">
-          <Building2 size={18} className="absolute left-3 top-3.5 text-gray-400" />
+          <Building2
+            size={18}
+            className="absolute left-3 top-3.5 text-gray-400"
+          />
           <input
             id="companyName"
             name="companyName"
@@ -157,14 +196,18 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
             value={formData.companyName}
             onChange={handleChange}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition"
-            style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+            style={{ "--tw-ring-color": COLORS.accent } as React.CSSProperties}
           />
         </div>
       </div>
 
       {/* Address */}
       <div>
-        <label htmlFor="address" className="block text-sm font-semibold mb-2" style={{ color: COLORS.primary }}>
+        <label
+          htmlFor="address"
+          className="block text-sm font-semibold mb-2"
+          style={{ color: COLORS.primary }}
+        >
           Alamat
         </label>
         <div className="relative">
@@ -176,14 +219,18 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
             value={formData.address}
             onChange={handleChange}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition"
-            style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+            style={{ "--tw-ring-color": COLORS.accent } as React.CSSProperties}
           />
         </div>
       </div>
 
       {/* City */}
       <div>
-        <label htmlFor="city" className="block text-sm font-semibold mb-2" style={{ color: COLORS.primary }}>
+        <label
+          htmlFor="city"
+          className="block text-sm font-semibold mb-2"
+          style={{ color: COLORS.primary }}
+        >
           Kota
         </label>
         <input
@@ -193,13 +240,17 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
           value={formData.city}
           onChange={handleChange}
           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition"
-          style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+          style={{ "--tw-ring-color": COLORS.accent } as React.CSSProperties}
         />
       </div>
 
       {/* Province */}
       <div>
-        <label htmlFor="province" className="block text-sm font-semibold mb-2" style={{ color: COLORS.primary }}>
+        <label
+          htmlFor="province"
+          className="block text-sm font-semibold mb-2"
+          style={{ color: COLORS.primary }}
+        >
           Provinsi
         </label>
         <input
@@ -209,13 +260,17 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
           value={formData.province}
           onChange={handleChange}
           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition"
-          style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+          style={{ "--tw-ring-color": COLORS.accent } as React.CSSProperties}
         />
       </div>
 
       {/* Postal Code */}
       <div>
-        <label htmlFor="postalCode" className="block text-sm font-semibold mb-2" style={{ color: COLORS.primary }}>
+        <label
+          htmlFor="postalCode"
+          className="block text-sm font-semibold mb-2"
+          style={{ color: COLORS.primary }}
+        >
           Kode Pos
         </label>
         <input
@@ -225,7 +280,7 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
           value={formData.postalCode}
           onChange={handleChange}
           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition"
-          style={{ '--tw-ring-color': COLORS.accent } as React.CSSProperties}
+          style={{ "--tw-ring-color": COLORS.accent } as React.CSSProperties}
         />
       </div>
 
@@ -237,7 +292,7 @@ export function EditProfileForm({ initialData, onSubmit }: EditProfileFormProps)
         style={{ backgroundColor: COLORS.accent }}
       >
         <Save size={18} />
-        {isLoading ? 'Sedang menyimpan...' : 'Simpan Perubahan'}
+        {isLoading ? "Sedang menyimpan..." : "Simpan Perubahan"}
       </button>
     </form>
   );

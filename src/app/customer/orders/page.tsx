@@ -6,9 +6,6 @@ import { Footer } from "@/components/guest/layout/Footer";
 import {
   Card,
   CardBody,
-  CardHeader,
-  Tabs,
-  Tab,
   Badge,
   Progress,
   Button,
@@ -18,11 +15,9 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-  DatePicker,
   DateRangePicker,
   Pagination,
   Skeleton,
-  Avatar,
   Accordion,
   AccordionItem,
   Alert,
@@ -33,12 +28,8 @@ import {
   Truck,
   CheckCircle2,
   Clock,
-  MapPin,
-  Phone,
-  Mail,
   Download,
   AlertCircle,
-  ArrowRight,
 } from "lucide-react";
 import { COLORS } from "@/lib/constants";
 
@@ -145,7 +136,7 @@ const statusConfig = {
   },
   processing: {
     label: "Diproses",
-    color: "info",
+    color: "primary",
     icon: Package,
   },
   shipped: {
@@ -167,7 +158,7 @@ const statusConfig = {
 
 export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -225,7 +216,20 @@ export default function OrdersPage() {
                   </label>
                   <div className="flex gap-2 flex-wrap">
                     {Object.entries(statusConfig).map(([key, config]) => (
-                      <Badge key={key} color={config.color} variant="flat">
+                      <Badge
+                        key={key}
+                        color={
+                          config.color as
+                            | "warning"
+                            | "primary"
+                            | "success"
+                            | "danger"
+                            | "default"
+                            | "secondary"
+                            | undefined
+                        }
+                        variant="flat"
+                      >
                         {config.label}
                       </Badge>
                     ))}
@@ -274,7 +278,18 @@ export default function OrdersPage() {
                       {/* Status */}
                       <div>
                         <p className="text-xs text-gray-600 mb-1">Status</p>
-                        <Badge color={getStatusColor(order.status)}>
+                        <Badge
+                          color={
+                            getStatusColor(order.status) as
+                              | "warning"
+                              | "primary"
+                              | "success"
+                              | "danger"
+                              | "default"
+                              | "secondary"
+                              | undefined
+                          }
+                        >
                           <StatusIcon className="w-3 h-3 mr-1" />
                           {config?.label}
                         </Badge>
@@ -358,7 +373,18 @@ export default function OrdersPage() {
               <ModalHeader className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
                   <span>Detail Pesanan</span>
-                  <Badge color={getStatusColor(selectedOrder.status)}>
+                  <Badge
+                    color={
+                      getStatusColor(selectedOrder.status) as
+                        | "warning"
+                        | "primary"
+                        | "success"
+                        | "danger"
+                        | "default"
+                        | "secondary"
+                        | undefined
+                    }
+                  >
                     {statusConfig[selectedOrder.status]?.label}
                   </Badge>
                 </div>
@@ -473,7 +499,7 @@ export default function OrdersPage() {
                 {selectedOrder.status === "shipped" && (
                   <Alert
                     icon={<AlertCircle className="w-4 h-4" />}
-                    color="info"
+                    color="primary"
                     title="Paket Sedang Dalam Perjalanan"
                   >
                     Paket Anda sedang dalam perjalanan menuju alamat tujuan.

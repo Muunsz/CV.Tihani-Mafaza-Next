@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { RoleLayout } from "@/components/admin/RoleLayout";
 import { COLORS } from "@/lib/constants";
 import {
@@ -14,11 +15,12 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { useState } from "react";
+import { LucideIcon } from "lucide-react";
 
 interface SettingsSection {
   id: string;
   label: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
 }
 
@@ -68,8 +70,11 @@ function SettingsContent() {
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
-  const handleChange = (e: any) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const target = e.target;
+    const { name, value, type } = target;
+    const checked = (target as HTMLInputElement).checked;
+
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,

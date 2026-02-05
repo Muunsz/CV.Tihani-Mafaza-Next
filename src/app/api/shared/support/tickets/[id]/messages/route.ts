@@ -9,7 +9,7 @@ import { ApiError } from '@/lib/api/errors';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const { id } = await params;
@@ -17,7 +17,7 @@ export async function GET(
 
     // Get ticket
     const ticket = await prisma.support_tickets.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     if (!ticket) {
@@ -33,13 +33,13 @@ export async function GET(
     }
 
     const messages = await prisma.support_ticket_messages.findMany({
-      where: { ticket_id: parseInt(params.id) },
+      where: { ticket_id: parseInt(id) },
       include: {
         users: {
           select: {
             id: true,
             full_name: true,
-            profile_image_url: true,
+            avatar_url: true,
           },
         },
       },
@@ -58,7 +58,7 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const { id } = await params;
@@ -72,16 +72,12 @@ export async function POST(
     const { message_text, attachment_url, internal_note } = body;
 
     if (!message_text) {
-      throw new ApiError(
-        'VALIDATION_ERROR',
-        'Message text is required',
-        400
-      );
+      throw new ApiError(400, 'Message text is required', 'VALIDATION_ERROR');
     }
 
     // Get ticket
     const ticket = await prisma.support_tickets.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     if (!ticket) {
@@ -99,7 +95,7 @@ export async function POST(
     // Create message
     const message = await prisma.support_ticket_messages.create({
       data: {
-        ticket_id: parseInt(params.id),
+        ticket_id: parseInt(id),
         user_id: parseInt(userId),
         message_text,
         attachment_url: attachment_url || null,
@@ -110,7 +106,7 @@ export async function POST(
           select: {
             id: true,
             full_name: true,
-            profile_image_url: true,
+            avatar_url: true,
           },
         },
       },

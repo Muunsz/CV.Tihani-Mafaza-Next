@@ -8,8 +8,9 @@ import { ApiError } from '@/lib/api/errors';
  * Resolve support ticket (admin/staff only)
  */
 export async function POST(
+
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const { id } = await params;
@@ -24,7 +25,7 @@ export async function POST(
 
     // Get ticket
     const ticket = await prisma.support_tickets.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       include: { users_support_tickets_user_idTousers: true },
     });
 
@@ -34,7 +35,7 @@ export async function POST(
 
     // Update ticket
     const resolvedTicket = await prisma.support_tickets.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: {
         status: 'resolved',
         resolved_at: new Date(),
@@ -45,7 +46,7 @@ export async function POST(
     if (resolution_notes) {
       await prisma.support_ticket_messages.create({
         data: {
-          ticket_id: parseInt(params.id),
+          ticket_id: parseInt(id),
           user_id: parseInt(userId || '0'),
           message_text: `Resolution: ${resolution_notes}`,
           internal_note: true,

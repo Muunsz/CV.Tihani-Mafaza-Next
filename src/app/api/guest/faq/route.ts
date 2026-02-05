@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ApiResponse, handleError } from '@/lib/api/response';
-import { ApiError } from '@/lib/api/errors';
+// import { ApiError } from '@/lib/api/errors';
 
 /**
  * GET /api/faq
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: any = { is_active: true };
+    const where: { is_active: boolean, category?: string } = { is_active: true };
     if (category) {
       where.category = category;
     }
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
  * GET /api/faq/categories
  * Get all FAQ categories
  */
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) {
   try {
     const categories = await prisma.faq.findMany({
       where: { is_active: true },

@@ -18,9 +18,9 @@ function GuestPortalContent() {
             Temukan ribuan produk berkualitas dari CV. Tihani Mafaza dengan harga transparan.
           </p>
           <blockquote className="text-sm italic border-l-4 border-orange-400 pl-4">
-            Motto kami: "Kepuasan Anda adalah Prestasi Kami"
+            Motto kami: &quot;Kepuasan Anda adalah Prestasi Kami&qout;
             <br />
-            "A thousand miles journey begins with one small step"
+            &quot;A thousand miles journey begins with one small step&quot;
           </blockquote>
         </div>
       </div>

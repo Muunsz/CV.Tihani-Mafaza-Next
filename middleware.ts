@@ -1,38 +1,61 @@
 
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
 export default auth(async (req) => {
   const { pathname } = req.nextUrl;
 
-  // Protected routes that require authentication
+  // Routes that require authentication
   const adminRoutes = ["/admin"];
   const staffRoutes = ["/staff"];
   const customerRoutes = ["/customer", "/orders", "/cart", "/wishlist"];
-  const publicGuestRoutes = ["/guest"];
+
+  // Public routes that do NOT require authentication
+  const publicRoutes = [
+    "/",
+    "/guest/auth",
+    "/guest/contact",
+    "/guest/about",
+    "/guest/team",
+    "/guest/history",
+    "/guest/portfolio",
+    "/guest/testimonials",
+    "/guest/blog",
+    "/guest/careers",
+    "/guest/faq",
+    "/guest/products",
+    "/guest/services",
+    "/guest/article-detail"
+  ];
+
+  // Protected routes that REQUIRE authentication
+  const protectedRoutes = [
+    ...adminRoutes,
+    ...staffRoutes,
+    ...customerRoutes,
+    "/guest/dashboard", // Guest dashboard requires auth
+  ];
 
   const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
   const isStaffRoute = staffRoutes.some((route) => pathname.startsWith(route));
   const isCustomerRoute = customerRoutes.some((route) =>
     pathname.startsWith(route)
   );
-  const isPublicGuestRoute = publicGuestRoutes.some((route) =>
+  const isPublicRoute = publicRoutes.some((route) =>
+    pathname === route || pathname.startsWith(route)
+  );
+  const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
 
-  const protectedRoutes = [
-    ...adminRoutes,
-    ...staffRoutes,
-    ...customerRoutes,
-    ...publicGuestRoutes,
-  ];
-
-  const isProtected = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
-
-  // Check authentication
-  if (isProtected && !req.auth) {
+  // Check authentication for protected routes
+  if (isProtectedRoute && !req.auth) {
     return Response.redirect(new URL("/guest/auth/login", req.url));
+  }
+
+  // Allow public routes to be accessed by anyone
+  if (isPublicRoute) {
+    return null;
   }
 
   // Role-based access control
@@ -79,9 +102,8 @@ export default auth(async (req) => {
       return null;
     }
 
-    // Guest routes
-    if (isPublicGuestRoute) {
-      // Allow guest routes for all authenticated users
+    // Guest dashboard - authenticated users can access
+    if (pathname.startsWith("/guest/dashboard")) {
       return null;
     }
   }

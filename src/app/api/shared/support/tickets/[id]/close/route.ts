@@ -9,7 +9,7 @@ import { ApiError } from '@/lib/api/errors';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const { id } = await params;
@@ -20,7 +20,7 @@ export async function POST(
 
     // Get ticket
     const ticket = await prisma.support_tickets.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     if (!ticket) {
@@ -38,7 +38,7 @@ export async function POST(
 
     // Update ticket
     const closedTicket = await prisma.support_tickets.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: {
         status: 'closed',
         closed_at: new Date(),
@@ -49,7 +49,7 @@ export async function POST(
     if (feedback_message) {
       await prisma.support_ticket_messages.create({
         data: {
-          ticket_id: parseInt(params.id),
+          ticket_id: parseInt(id),
           user_id: parseInt(userId || '0'),
           message_text: `Feedback (Rating: ${feedback_rating || 'N/A'}): ${feedback_message}`,
           internal_note: false,

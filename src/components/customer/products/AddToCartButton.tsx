@@ -66,7 +66,7 @@ export function AddToCartButton({ productId, productName, onAddSuccess }: AddToC
             </div>
             
             <p className="text-gray-600 mb-6">
-              Anda harus masuk terlebih dahulu untuk menambahkan "{productName}" ke keranjang belanja Anda.
+              Anda harus masuk terlebih dahulu untuk menambahkan &quot;{productName}&quot; ke keranjang belanja Anda.
             </p>
 
             <div className="flex gap-3">

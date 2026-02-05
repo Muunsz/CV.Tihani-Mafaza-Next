@@ -10,7 +10,7 @@ import { Prisma } from '@prisma/client'; // Import Prisma
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const { id } = await params;
@@ -19,14 +19,14 @@ export async function POST(
     const body = await request.json();
 
     if (role !== 'admin' && role !== 'staff') {
-      throw new ApiError('UNAUTHORIZED', 'Admin or staff access required', 403);
+      throw new ApiError(403, 'Admin or staff access required', 'UNAUTHORIZED');
     }
 
     const { amount, reason, items } = body;
 
     // Get order
     const order = await prisma.orders.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       include: {
         order_items: true,
         payments: {
@@ -36,11 +36,11 @@ export async function POST(
     });
 
     if (!order) {
-      throw new ApiError('NOT_FOUND', 'Order not found', 404);
+      throw new ApiError(404, 'Order not found', 'NOT_FOUND');
     }
 
     if (order.payments.length === 0) {
-      throw new ApiError('INVALID_REQUEST', 'No completed payments found', 400);
+      throw new ApiError(400, 'No completed payments found', 'INVALID_REQUEST');
     }
 
     // Validate refund amount
@@ -50,16 +50,16 @@ export async function POST(
     );
     if (Number(amount) > totalPaid) {
       throw new ApiError(
-        'INVALID_REQUEST',
+        400,
         `Refund amount exceeds paid amount (${totalPaid})`,
-        400
+        'INVALID_REQUEST'
       );
     }
 
     // Create refund payment
     const refundPayment = await prisma.payments.create({
       data: {
-        order_id: parseInt(params.id),
+        order_id: parseInt(id),
         payment_method: 'refund',
         amount: new Prisma.Decimal(amount),
         payment_status: 'refunded',
@@ -70,7 +70,7 @@ export async function POST(
     // Restore inventory if partial or full refund
     if (items && Array.isArray(items)) {
       await Promise.all(
-        items.map(async (item: any) => {
+        (items as { id: number; quantity?: number }[]).map(async (item) => {
           const orderItem = order.order_items.find(
             (oi) => oi.id === item.id
           );

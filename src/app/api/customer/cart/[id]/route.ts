@@ -18,39 +18,36 @@ export async function PUT(
     const { quantity } = body;
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     if (!quantity || quantity < 1) {
-      throw new ApiError(
-        'VALIDATION_ERROR',
-        'Quantity must be at least 1'
-      );
+      throw new ApiError(400, 'Quantity must be at least 1', 'VALIDATION_ERROR');
     }
 
     const cartItem = await prisma.cart_items.findUnique({
       where: { id: parseInt(id) },
       include: {
-        shopping_cart: true,
-        product: true,
+        shopping_carts: true,
+        products: true,
       },
     });
 
     if (!cartItem) {
-      throw new ApiError('NOT_FOUND', 'Cart item not found', 404);
+      throw new ApiError(404, 'Cart item not found', 'NOT_FOUND');
     }
 
     // Verify ownership
-    if (cartItem.shopping_cart.user_id !== parseInt(userId)) {
-      throw new ApiError('FORBIDDEN', 'Cannot access this cart', 403);
+    if (cartItem.shopping_carts.user_id !== parseInt(userId)) {
+      throw new ApiError(403, 'Cannot access this cart', 'FORBIDDEN');
     }
 
     // Check stock
-    if (cartItem.product.stock_quantity < quantity) {
+    if ((cartItem.products.stock_quantity || 0) < quantity) {
       throw new ApiError(
-        'INSUFFICIENT_STOCK',
-        `Only ${cartItem.product.stock_quantity} items available`,
-        400
+        400,
+        `Only ${cartItem.products.stock_quantity || 0} items available`,
+        'INSUFFICIENT_STOCK'
       );
     }
 
@@ -66,11 +63,11 @@ export async function PUT(
     });
 
     const totalPrice = items.reduce(
-      (sum, item) => sum + item.price_at_add * item.quantity,
+      (sum, item) => sum + item.price_at_add.toNumber() * item.quantity,
       0
     );
 
-    await prisma.shoppingCart.update({
+    await prisma.shopping_carts.update({
       where: { id: cartItem.cart_id },
       data: { total_price: totalPrice },
     });
@@ -96,21 +93,21 @@ export async function DELETE(
     const userId = request.headers.get('x-user-id');
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     const cartItem = await prisma.cart_items.findUnique({
       where: { id: parseInt(id) },
-      include: { shopping_cart: true },
+      include: { shopping_carts: true },
     });
 
     if (!cartItem) {
-      throw new ApiError('NOT_FOUND', 'Cart item not found', 404);
+      throw new ApiError(404, 'Cart item not found', 'NOT_FOUND');
     }
 
     // Verify ownership
-    if (cartItem.shopping_cart.user_id !== parseInt(userId)) {
-      throw new ApiError('FORBIDDEN', 'Cannot access this cart', 403);
+    if (cartItem.shopping_carts.user_id !== parseInt(userId)) {
+      throw new ApiError(403, 'Cannot access this cart', 'FORBIDDEN');
     }
 
     // Delete item
@@ -124,11 +121,11 @@ export async function DELETE(
     });
 
     const totalPrice = items.reduce(
-      (sum, item) => sum + item.price_at_add * item.quantity,
+      (sum, item) => sum + item.price_at_add.toNumber() * item.quantity,
       0
     );
 
-    await prisma.shoppingCart.update({
+    await prisma.shopping_carts.update({
       where: { id: cartItem.cart_id },
       data: { total_price: totalPrice },
     });

@@ -7,8 +7,8 @@ import { z } from 'zod';
 // Validation schema
 const getReviewsSchema = z.object({
   productId: z.string().optional(),
-  page: z.string().transform(Number).optional().default('1'),
-  limit: z.string().transform(Number).optional().default('10'),
+  page: z.string().transform(Number).optional().default(1),
+  limit: z.string().transform(Number).optional().default(10),
 });
 
 const createReviewSchema = z.object({
@@ -29,7 +29,9 @@ export async function GET(request: NextRequest) {
 
     const skip = (query.page - 1) * query.limit;
 
-    let where: any = {};
+    const where: {
+      product_id?: number;
+    } = {};
     if (query.productId) {
       where.product_id = parseInt(query.productId);
     }
@@ -42,7 +44,7 @@ export async function GET(request: NextRequest) {
             select: {
               id: true,
               full_name: true,
-              profile_image_url: true,
+              avatar_url: true,
             },
           },
         },
@@ -76,7 +78,7 @@ export async function POST(request: NextRequest) {
     const userId = request.headers.get('x-user-id');
 
     if (!userId) {
-      throw new ApiError('Unauthorized', 401, 'UNAUTHORIZED');
+      throw new ApiError(401, "Unauthorized", "UNAUTHORIZED");
     }
 
     const validatedData = createReviewSchema.parse(body);
@@ -87,7 +89,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!product) {
-      throw new ApiError('Product not found', 404, 'NOT_FOUND');
+      throw new ApiError(404, "Product not found", "NOT_FOUND");
     }
 
     // Check if user already reviewed this product
@@ -99,7 +101,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingReview) {
-      throw new ApiError('You already reviewed this product', 409, 'DUPLICATE');
+      throw new ApiError(409, "You already reviewed this product", "DUPLICATE");
     }
 
     // Create review
@@ -109,14 +111,14 @@ export async function POST(request: NextRequest) {
         user_id: parseInt(userId),
         rating: validatedData.rating,
         title: validatedData.title,
-        comment: validatedData.comment,
+        review_text: validatedData.comment,
       },
       include: {
         users: {
           select: {
             id: true,
             full_name: true,
-            profile_image_url: true,
+            avatar_url: true,
           },
         },
       },
@@ -127,3 +129,4 @@ export async function POST(request: NextRequest) {
     return handleError(error);
   }
 }
+

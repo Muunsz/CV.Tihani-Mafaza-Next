@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (promotion.usage_limit && promotion.usage_count >= promotion.usage_limit) {
+    if (promotion.usage_limit && (promotion.usage_count || 0) >= promotion.usage_limit) {
       return NextResponse.json(
         { error: { code: 'LIMIT_EXCEEDED', message: 'Coupon usage limit exceeded' } },
         { status: 400 }

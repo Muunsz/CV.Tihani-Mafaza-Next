@@ -1,29 +1,5 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import { COLORS } from "@/lib/constants";
-import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import {
-  ShoppingCart,
-  Heart,
-  Package,
-  Truck,
-  CreditCard,
-  Star,
-  Search,
-  Filter,
-  ChevronRight,
-  MessageCircle,
-  User,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  Download,
-  LogOut,
-} from "lucide-react";
-
 // Mock data untuk orders
 const orders = [
   {
@@ -69,6 +45,22 @@ const wishlist = [
   },
 ];
 
+import React, { useState } from "react";
+import Link from "next/link";
+import { COLORS } from "@/lib/constants";
+import { CustomerLayout } from "@/components/customer/CustomerLayout";
+import {
+  ShoppingCart,
+  Heart,
+  Truck,
+  CreditCard,
+  Star,
+  Search,
+  ChevronRight,
+  MessageCircle,
+  AlertCircle,
+} from "lucide-react";
+
 // Mock data untuk products featured
 const featuredProducts = [
   {
@@ -113,6 +105,31 @@ const featuredProducts = [
   },
 ];
 
+type OrderStatus = "delivered" | "in_transit" | "processing";
+interface StatusBadgeProps {
+  status: OrderStatus;
+}
+
+function StatusBadge({ status }: StatusBadgeProps) {
+  const styles: Record<
+    OrderStatus,
+    { bg: string; text: string; label: string }
+  > = {
+    delivered: { bg: "#10b98115", text: "#10b981", label: "Terkirim" },
+    in_transit: { bg: "#3b82f515", text: "#3b82f5", label: "Sedang Dikirim" },
+    processing: { bg: "#f5951515", text: "#f59e0b", label: "Diproses" },
+  };
+  const style = styles[status];
+  return (
+    <span
+      className="px-3 py-1 rounded-full text-xs font-semibold"
+      style={{ backgroundColor: style.bg, color: style.text }}
+    >
+      {style.label}
+    </span>
+  );
+}
+
 const stats = [
   {
     label: "Total Pesanan",
@@ -140,70 +157,9 @@ const stats = [
   },
 ];
 
-function StatusBadge({
-  status,
-}: {
-  status: "delivered" | "in_transit" | "processing";
-}) {
-  const styles = {
-    delivered: { bg: "#10b98115", text: "#10b981", label: "Terkirim" },
-    in_transit: { bg: "#3b82f515", text: "#3b82f5", label: "Sedang Dikirim" },
-    processing: { bg: "#f5951515", text: "#f59e0b", label: "Diproses" },
-  };
-
-  const style = styles[status];
-  return (
-    <span
-      className="px-3 py-1 rounded-full text-xs font-semibold"
-      style={{
-        backgroundColor: style.bg,
-        color: style.text,
-      }}
-    >
-      {style.label}
-    </span>
-  );
-}
-
 function CustomerDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (status === "loading") return;
-    if (!session) {
-      router.push("/guest/auth/login");
-      return;
-    }
-    if (session.user?.role !== "customer") {
-      // Redirect to appropriate dashboard
-      if (session.user?.role === "admin") {
-        router.push("/admin/dashboard");
-      } else if (session.user?.role === "staff") {
-        router.push("/staff/dashboard");
-      } else {
-        router.push("/guest");
-      }
-    }
-  }, [session, status, router]);
-
-  const handleLogout = async () => {
-    await signOut({ redirect: true, callbackUrl: "/guest/auth/login" });
-  };
-
-  if (status === "loading") {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
-
-  if (!session || session.user?.role !== "customer") {
-    return null;
-  }
 
   const filteredProducts = featuredProducts.filter((product) => {
     const matchesSearch = product.name
@@ -228,20 +184,8 @@ function CustomerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Header with Logout */}
-        <div className="flex justify-between items-center">
-          <div></div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-red-50 transition border border-gray-300"
-          >
-            <LogOut size={18} />
-            <span>Keluar</span>
-          </button>
-        </div>
-
+    <CustomerLayout>
+      <div className="p-6 space-y-8">
         {/* Header Welcome Section */}
         <div
           className="rounded-lg p-8 text-white"
@@ -316,12 +260,16 @@ function CustomerDashboard() {
                   </div>
                 </div>
                 <div className="flex items-center gap-6">
-                  <StatusBadge status={order.status} />
+                  <StatusBadge
+                    status={
+                      order.status as "delivered" | "in_transit" | "processing"
+                    }
+                  />
                   <p className="font-semibold text-gray-900 min-w-fit">
                     {formatPrice(order.total)}
                   </p>
                   <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-                    <ChevronRight size={20} className="text-gray-600" />
+                    <StatusBadge status={order.status as OrderStatus} />
                   </button>
                 </div>
               </div>
@@ -427,7 +375,7 @@ function CustomerDashboard() {
                 >
                   {/* Product Image Placeholder */}
                   <div
-                    className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center relative"
+                    className="w-full h-48 bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center relative"
                     style={{
                       backgroundColor: COLORS.primary + "20",
                     }}
@@ -523,7 +471,7 @@ function CustomerDashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </CustomerLayout>
   );
 }
 

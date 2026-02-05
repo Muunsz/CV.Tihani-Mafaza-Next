@@ -51,7 +51,7 @@ export default function CategoryPage() {
       <Navbar />
       <main>
         {/* Header */}
-        <section className="bg-gradient-to-b from-blue-50 to-white py-16">
+        <section className="bg-linear-to-b from-blue-50 to-white py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link
               href="/products"
@@ -84,11 +84,14 @@ export default function CategoryPage() {
                     key={product.id}
                     id={product.id}
                     name={product.name}
-                    priceFinal={product.priceFinal}
-                    dppValue={product.dppValue}
-                    stock={product.stock}
-                    image={product.image}
+                    slug={product.name.replace(/\s+/g, "-").toLowerCase()}
+                    price={product.priceFinal}
+                    discount_percentage={0}
+                    stock_quantity={product.stock}
+                    image_url={product.image}
                     category={product.category}
+                    rating={0}
+                    review_count={0}
                   />
                 ))}
               </div>

@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!product) {
-        throw new ApiError('NOT_FOUND', 'Product not found', 404);
+        throw new ApiError(404, 'Product not found', 'NOT_FOUND');
       }
     }
 

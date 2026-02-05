@@ -7,7 +7,6 @@ import { Footer } from "@/components/guest/layout/Footer";
 import {
   Card,
   CardBody,
-  CardHeader,
   Button,
   Input,
   Select,
@@ -32,14 +31,7 @@ import {
   Accordion,
   AccordionItem,
 } from "@heroui/react";
-import {
-  ShoppingCart,
-  Heart,
-  Share2,
-  Check,
-  AlertCircle,
-  Star,
-} from "lucide-react";
+import { ShoppingCart, Heart, Share2, Check, Star } from "lucide-react";
 import { COLORS, PRODUCTS } from "@/lib/constants";
 import { useParams } from "next/navigation";
 
@@ -69,19 +61,43 @@ export default function ProductDetailPage() {
   const productId = params.productId as string;
 
   // Find product from constants or use mock
-  const product = PRODUCTS.find((p) => p.id === productId);
+  const product = PRODUCTS.find((p) => String(p.id) === productId);
 
-  const mockProduct: Product = product || {
-    id: "1",
-    name: "Produk Tidak Ditemukan",
-    priceFinal: 0,
-    image: "/placeholder.svg",
-    description: "Produk yang Anda cari tidak tersedia.",
-    category: "General",
-    stock: 0,
-  };
+  // Ensure all required fields for Product
+  // Use type for product from PRODUCTS
+  type ProductRaw = (typeof PRODUCTS)[number];
+  const normalizeProduct = (p: ProductRaw): Product => ({
+    id: String(p.id),
+    name: p.name,
+    priceFinal: p.priceFinal,
+    image: p.image,
+    description:
+      (p as { description?: string })?.description ?? "Tidak ada deskripsi.",
+    category: p.category,
+    stock: p.stock,
+    specifications: p.specifications,
+    priceOriginal: (p as { priceOriginal?: number })?.priceOriginal,
+    rating: (p as { rating?: number })?.rating,
+    reviews: (p as { reviews?: number })?.reviews,
+    availability: (p as { availability?: string })?.availability,
+    warranty: (p as { warranty?: string })?.warranty,
+    sku: (p as { sku?: string })?.sku,
+    colors: (p as { colors?: string[] })?.colors,
+    sizes: (p as { sizes?: string[] })?.sizes,
+  });
+  const mockProduct: Product = product
+    ? normalizeProduct(product)
+    : {
+        id: "1",
+        name: "Produk Tidak Ditemukan",
+        priceFinal: 0,
+        image: "/placeholder.svg",
+        description: "Produk yang Anda cari tidak tersedia.",
+        category: "General",
+        stock: 0,
+      };
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [selectedColor, setSelectedColor] = useState(
     mockProduct.colors?.[0] || "Default",
   );

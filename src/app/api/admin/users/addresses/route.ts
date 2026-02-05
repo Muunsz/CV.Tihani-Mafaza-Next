@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const userId = request.headers.get('x-user-id');
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     const addresses = await prisma.user_addresses.findMany({
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     const {
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     if (!postal_code) errors.postal_code = 'Postal code is required';
 
     if (Object.keys(errors).length > 0) {
-      throw new ApiError('VALIDATION_ERROR', 'Validation failed', 400, errors);
+      throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR');
     }
 
     // If setting as default, unset other addresses

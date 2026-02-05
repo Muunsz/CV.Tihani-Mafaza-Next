@@ -17,20 +17,20 @@ export async function PUT(
     const body = await request.json();
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     // Verify ownership
     const address = await prisma.user_addresses.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     if (!address) {
-      throw new ApiError('NOT_FOUND', 'Address not found', 404);
+      throw new ApiError(404, 'Address not found', 'NOT_FOUND');
     }
 
     if (address.user_id !== parseInt(userId)) {
-      throw new ApiError('FORBIDDEN', 'Cannot access this address', 403);
+      throw new ApiError(403, 'Cannot access this address', 'FORBIDDEN');
     }
 
     // If setting as default, unset others
@@ -38,14 +38,14 @@ export async function PUT(
       await prisma.user_addresses.updateMany({
         where: {
           user_id: parseInt(userId),
-          id: { not: parseInt(params.id) },
+          id: { not: parseInt(id) },
         },
         data: { is_default: false },
       });
     }
 
     const updated = await prisma.user_addresses.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: body,
       select: {
         id: true,
@@ -79,24 +79,24 @@ export async function DELETE(
     const userId = request.headers.get('x-user-id');
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     // Verify ownership
     const address = await prisma.user_addresses.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     if (!address) {
-      throw new ApiError('NOT_FOUND', 'Address not found', 404);
+      throw new ApiError(404, 'Address not found', 'NOT_FOUND');
     }
 
     if (address.user_id !== parseInt(userId)) {
-      throw new ApiError('FORBIDDEN', 'Cannot access this address', 403);
+      throw new ApiError(403, 'Cannot access this address', 'FORBIDDEN');
     }
 
     await prisma.user_addresses.delete({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     return NextResponse.json(

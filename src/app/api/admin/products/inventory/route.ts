@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const productId = searchParams.get('product_id');
 
     if (!productId) {
-      throw new ApiError('VALIDATION_ERROR', 'Product ID is required', 400);
+      throw new ApiError(400, 'Product ID is required', 'VALIDATION_ERROR');
     }
 
     const product = await prisma.products.findUnique({
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!product) {
-      throw new ApiError('NOT_FOUND', 'Product not found', 404);
+      throw new ApiError(404, 'Product not found', 'NOT_FOUND');
     }
 
     return NextResponse.json(ApiResponse.success(product));
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (role !== 'admin' && role !== 'staff') {
-      throw new ApiError('UNAUTHORIZED', 'Admin or staff access required', 403);
+      throw new ApiError(403, 'Admin or staff access required', 'UNAUTHORIZED');
     }
 
     const { product_id, quantity_change, reason, reference_id, notes } = body;
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (Object.keys(errors).length > 0) {
-      throw new ApiError('VALIDATION_ERROR', 'Validation failed', 400, errors);
+      throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR');
     }
 
     // Update product stock
@@ -85,16 +85,16 @@ export async function POST(request: NextRequest) {
     });
 
     if (!product) {
-      throw new ApiError('NOT_FOUND', 'Product not found', 404);
+      throw new ApiError(404, 'Product not found', 'NOT_FOUND');
     }
 
     const newStock = (product.stock_quantity || 0) + quantity_change;
 
     if (newStock < 0) {
       throw new ApiError(
-        'INVALID_REQUEST',
+        400,
         'Insufficient stock for this operation',
-        400
+        'INVALID_REQUEST'
       );
     }
 

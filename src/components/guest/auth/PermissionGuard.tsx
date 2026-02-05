@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { hasPermission, canAccessResource, UserRole } from '@/lib/roles';
+import React from "react";
+import { hasPermission, canAccessResource, UserRole } from "@/lib/roles";
 
 interface PermissionGuardProps {
   children: React.ReactNode;
@@ -23,7 +23,7 @@ export function PermissionGuard({
   permission,
   requiredRoles,
   fallback = null,
-  userRole = 'guest',
+  userRole = "guest",
 }: PermissionGuardProps) {
   // Check permission if provided
   if (permission && !hasPermission(userRole, permission)) {
@@ -46,13 +46,13 @@ export function PermissionGuard({
 /**
  * Higher-order component to protect components with permission requirements
  */
-export function withPermission(
-  Component: React.ComponentType<any>,
+export function withPermission<P extends { userRole?: UserRole }>(
+  Component: React.ComponentType<P>,
   permission: string,
-  fallback?: React.ReactNode
+  fallback?: React.ReactNode,
 ) {
-  return function ProtectedComponent(props: any) {
-    const userRole = props.userRole || 'guest';
+  return function ProtectedComponent(props: P) {
+    const userRole = props.userRole || "guest";
 
     return (
       <PermissionGuard

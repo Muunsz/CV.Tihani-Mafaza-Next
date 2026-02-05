@@ -17,7 +17,7 @@ const VALID_STATUSES = [
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const { id } = await params;
@@ -26,31 +26,31 @@ export async function PUT(
     const body = await request.json();
 
     if (role !== 'admin' && role !== 'staff') {
-      throw new ApiError('UNAUTHORIZED', 'Admin or staff access required', 403);
+      throw new ApiError(403, 'Admin or staff access required', 'UNAUTHORIZED');
     }
 
-    const { order_status, tracking_number, notes } = body;
+    const { order_status, tracking_number } = body;
 
     if (!order_status || !VALID_STATUSES.includes(order_status)) {
       throw new ApiError(
-        'VALIDATION_ERROR',
+        400,
         `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`,
-        400
+        'VALIDATION_ERROR'
       );
     }
 
     // Get order
     const order = await prisma.orders.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     if (!order) {
-      throw new ApiError('NOT_FOUND', 'Order not found', 404);
+      throw new ApiError(404, 'Order not found', 'NOT_FOUND');
     }
 
     // Update order
     const updatedOrder = await prisma.orders.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: {
         order_status,
         ...(tracking_number && { tracking_number }),
@@ -58,7 +58,7 @@ export async function PUT(
       include: {
         order_items: true,
         users: {
-          select: { email: true, full_name: true },
+          select: { id: true, email: true, full_name: true },
         },
       },
     });
@@ -69,14 +69,14 @@ export async function PUT(
         user_id: parseInt(userId || '0'),
         action: 'UPDATE_ORDER_STATUS',
         entity_type: 'orders',
-        entity_id: parseInt(params.id),
+        entity_id: parseInt(id),
         old_value: { status: order.order_status },
         new_value: { status: order_status },
       },
     });
 
     // Create notification for user
-    if (updatedOrder.users) {
+    if (updatedOrder.users && updatedOrder.users.id) {
       await prisma.notifications.create({
         data: {
           user_id: updatedOrder.users.id,

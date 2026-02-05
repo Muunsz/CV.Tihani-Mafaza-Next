@@ -17,11 +17,11 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     // Build where clause
-    const where: any = { user_id: parseInt(userId) };
+    const where: { user_id: number; order_status?: string } = { user_id: parseInt(userId) };
     if (status) {
       where.order_status = status;
     }
@@ -72,27 +72,29 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     const {
       shipping_address_id,
       shipping_method,
-      notes,
+      // notes removed if not used
     } = body;
 
     // Validate required fields
     if (!shipping_address_id) {
       throw new ApiError(
-        'VALIDATION_ERROR',
-        'Shipping address is required'
+        400,
+        'Shipping address is required',
+        'VALIDATION_ERROR'
       );
     }
 
     if (!shipping_method) {
       throw new ApiError(
-        'VALIDATION_ERROR',
-        'Shipping method is required'
+        400,
+        'Shipping method is required',
+        'VALIDATION_ERROR'
       );
     }
 
@@ -102,17 +104,17 @@ export async function POST(request: NextRequest) {
     });
 
     if (!address || address.user_id !== parseInt(userId)) {
-      throw new ApiError('FORBIDDEN', 'Invalid shipping address', 403);
+      throw new ApiError(403, 'Invalid shipping address', 'FORBIDDEN');
     }
 
     // Get user's cart
-    const cart = await prisma.shoppingCart.findFirst({
+    const cart = await prisma.shopping_carts.findFirst({
       where: { user_id: parseInt(userId) },
       include: { cart_items: true },
     });
 
     if (!cart || cart.cart_items.length === 0) {
-      throw new ApiError('VALIDATION_ERROR', 'Cart is empty', 400);
+      throw new ApiError(400, 'Cart is empty', 'VALIDATION_ERROR');
     }
 
     // Generate order number
@@ -125,11 +127,10 @@ export async function POST(request: NextRequest) {
         data: {
           order_number: orderNumber,
           user_id: parseInt(userId),
-          subtotal: cart.total_price,
-          total_amount: cart.total_price,
+          subtotal: cart.total_price ?? 0,
+          total_amount: cart.total_price ?? 0,
           shipping_address_id: parseInt(shipping_address_id),
           shipping_method,
-          notes,
           order_status: 'pending',
           payment_status: 'unpaid',
         },
@@ -142,8 +143,8 @@ export async function POST(request: NextRequest) {
             order_id: newOrder.id,
             product_id: item.product_id,
             quantity: item.quantity,
-            price_per_unit: item.price_at_add,
-            total_price: item.price_at_add * item.quantity,
+            unit_price: item.price_at_add,
+            total_price: item.price_at_add.toNumber() * item.quantity,
           },
         });
       }
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
         where: { cart_id: cart.id },
       });
 
-      await tx.shoppingCart.update({
+      await tx.shopping_carts.update({
         where: { id: cart.id },
         data: { total_price: 0 },
       });

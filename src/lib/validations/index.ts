@@ -90,6 +90,7 @@ export const registerSchema = z.object({
     .regex(/[A-Z]/, 'Password must contain uppercase letter')
     .regex(/[0-9]/, 'Password must contain number'),
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
+  phone_number: z.string().min(10, 'Phone number must be at least 10 digits'),
 });
 
 export const loginSchema = z.object({
@@ -135,7 +136,7 @@ export const notificationSchema = z.object({
   type: z.string().max(50),
   title: z.string().max(255),
   message: z.string(),
-  data: z.record(z.any()).optional(),
+  data: z.record(z.string(), z.any()).optional(),
 });
 
 export type Notification = z.infer<typeof notificationSchema>;

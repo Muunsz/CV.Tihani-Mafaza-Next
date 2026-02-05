@@ -99,7 +99,7 @@ export default function TestimonialsPage() {
 
                   {/* Testimonial Text */}
                   <p className="text-gray-700 text-lg mb-6 italic leading-relaxed">
-                    "{testimonial.content}"
+                    &quot;{testimonial.content}&quot;
                   </p>
 
                   {/* Author Info */}

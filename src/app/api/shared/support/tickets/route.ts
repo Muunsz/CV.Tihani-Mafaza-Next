@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     const tickets = await prisma.support_tickets.findMany({
       where: { user_id: parseInt(userId) },
       include: {
-        support_messages: {
+        support_ticket_messages: {
           select: {
             id: true,
             message_text: true,
@@ -64,9 +64,10 @@ export async function POST(request: NextRequest) {
         user_id: parseInt(userId),
         subject: validatedData.subject,
         category: validatedData.category,
+        description: validatedData.message,
         status: 'open',
         priority: 'medium',
-        support_messages: {
+        support_ticket_messages: {
           create: {
             user_id: parseInt(userId),
             message_text: validatedData.message,
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
         },
       },
       include: {
-        support_messages: true,
+        support_ticket_messages: true,
       },
     });
 

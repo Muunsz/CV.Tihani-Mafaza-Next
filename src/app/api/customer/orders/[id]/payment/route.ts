@@ -32,7 +32,7 @@ export async function POST(
     }
 
     if (Object.keys(errors).length > 0) {
-      throw new ApiError('VALIDATION_ERROR', 'Validation failed', 400, errors);
+      throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR', errors);
     }
 
     // Get order
@@ -41,19 +41,19 @@ export async function POST(
     });
 
     if (!order) {
-      throw new ApiError('NOT_FOUND', 'Order not found', 404);
+      throw new ApiError(404, 'Order not found', 'NOT_FOUND');
     }
 
     if (order.payment_status === 'paid') {
-      throw new ApiError('CONFLICT', 'Order already paid', 409);
+      throw new ApiError(409, 'Order already paid', 'CONFLICT');
     }
 
     // Verify amount matches
     if (Number(amount) !== Number(order.total_amount)) {
       throw new ApiError(
-        'INVALID_REQUEST',
+        400,
         'Payment amount does not match order total',
-        400
+        'INVALID_REQUEST'
       );
     }
 
@@ -108,7 +108,7 @@ export async function GET(
     });
 
     if (!order) {
-      throw new ApiError('NOT_FOUND', 'Order not found', 404);
+      throw new ApiError(404, 'Order not found', 'NOT_FOUND');
     }
 
     const payments = await prisma.payments.findMany({

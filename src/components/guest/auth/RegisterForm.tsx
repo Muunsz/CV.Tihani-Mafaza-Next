@@ -15,19 +15,11 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
-  CheckCircle,
   Loader,
 } from "lucide-react";
 import { signIn } from "next-auth/react";
-import ReCAPTCHA from "react-google-recaptcha"; // Import ReCAPTCHA
 
-const RECAPTCHA_SITE_KEY = "your_recaptcha_site_key_here"; // Declare RECAPTCHA_SITE_KEY
-
-interface RegisterFormProps {
-  onSubmit?: (data: any) => void;
-}
-
-export function RegisterForm({ onSubmit }: RegisterFormProps) {
+export function RegisterForm() {
   const [formData, setFormData] = useState({
     fullName: "",
     companyName: "",
@@ -44,8 +36,6 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [captchaInput, setCaptchaInput] = useState("");
   const [googleLoading, setGoogleLoading] = useState(false);
-  const recaptchaRef = useRef<any>(null);
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -119,8 +109,12 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
       // Success - redirect to login or show success message
       alert("Pendaftaran berhasil! Silakan login dengan akun Anda.");
       window.location.href = "/guest/auth/login";
-    } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan saat pendaftaran");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message || "Terjadi kesalahan saat pendaftaran");
+      } else {
+        setError("Terjadi kesalahan saat pendaftaran");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -129,9 +123,9 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      await signIn("google", { 
+      await signIn("google", {
         callbackUrl: "/customer/dashboard",
-        redirect: true 
+        redirect: true,
       });
     } catch (error) {
       console.error("Google sign in error:", error);
@@ -146,10 +140,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
       {/* Error Message */}
       {error && (
         <div className="flex gap-3 p-4 rounded-lg bg-red-50 border border-red-200">
-          <AlertCircle
-            size={20}
-            className="text-red-600 flex-shrink-0 mt-0.5"
-          />
+          <AlertCircle size={20} className="text-red-600 shrink-0 mt-0.5" />
           <p className="text-sm text-red-700">{error}</p>
         </div>
       )}

@@ -27,7 +27,7 @@ export function HeroSection() {
               className="p-4 rounded-lg border-l-4 italic text-gray-700"
               style={{ borderColor: COLORS.accent }}
             >
-              "{COMPANY.motto}"
+              &quot;{COMPANY.motto}&quot;
             </div>
 
             {/* CTA Buttons */}

@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/guest/layout/Navbar";
 import { Footer } from "@/components/guest/layout/Footer";
-import { COLORS, COMPANY, USP } from "@/lib/constants";
+import { COLORS, COMPANY } from "@/lib/constants";
 import { CheckCircle } from "lucide-react";
 
 export const metadata = {
@@ -15,7 +15,7 @@ export default function AboutPage() {
       <Navbar />
       <main>
         {/* Header */}
-        <section className="bg-gradient-to-b from-blue-50 to-white py-16">
+        <section className="bg-linear-to-b from-blue-50 to-white py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1
               className="text-5xl font-bold mb-4"
@@ -54,14 +54,14 @@ export default function AboutPage() {
                     responsif terhadap kebutuhan klien kami.
                   </p>
                   <p>
-                    Filosofi kami adalah "{COMPANY.motto}" - kami percaya bahwa
-                    perjalanan seribu mil dimulai dengan satu langkah kecil, dan
-                    setiap klien adalah awal dari hubungan bisnis yang panjang
-                    dan saling menguntungkan.
+                    Filosofi kami adalah &quot;{COMPANY.motto}&quot; - kami
+                    percaya bahwa perjalanan seribu mil dimulai dengan satu
+                    langkah kecil, dan setiap klien adalah awal dari hubungan
+                    bisnis yang panjang dan saling menguntungkan.
                   </p>
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-blue-50 to-orange-50 rounded-lg p-12 border border-gray-200">
+              <div className="bg-linear-to-br from-blue-50 to-orange-50 rounded-lg p-12 border border-gray-200">
                 <div className="text-center space-y-6">
                   <div className="text-6xl">🏢</div>
                   <div>
@@ -78,7 +78,7 @@ export default function AboutPage() {
                     style={{ backgroundColor: COLORS.accent }}
                   />
                   <p className="text-gray-700 italic">
-                    "Kepuasan Anda adalah Prestasi Kami"
+                    &quot;Kepuasan Anda adalah Prestasi Kami&quot;
                   </p>
                 </div>
               </div>
@@ -113,7 +113,7 @@ export default function AboutPage() {
                 <ul className="space-y-3">
                   <li className="flex gap-3">
                     <CheckCircle
-                      className="w-5 h-5 flex-shrink-0"
+                      className="w-5 h-5 shrink-0"
                       style={{ color: COLORS.accent }}
                     />
                     <span className="text-gray-700">
@@ -123,7 +123,7 @@ export default function AboutPage() {
                   </li>
                   <li className="flex gap-3">
                     <CheckCircle
-                      className="w-5 h-5 flex-shrink-0"
+                      className="w-5 h-5 shrink-0"
                       style={{ color: COLORS.accent }}
                     />
                     <span className="text-gray-700">
@@ -133,7 +133,7 @@ export default function AboutPage() {
                   </li>
                   <li className="flex gap-3">
                     <CheckCircle
-                      className="w-5 h-5 flex-shrink-0"
+                      className="w-5 h-5 shrink-0"
                       style={{ color: COLORS.accent }}
                     />
                     <span className="text-gray-700">

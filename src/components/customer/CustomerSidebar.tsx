@@ -4,13 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { COLORS } from "@/lib/constants";
 import {
   LayoutGrid,
   ShoppingBag,
   Heart,
   Package,
-  MessageSquare,
   Settings,
   LogOut,
   Menu,
@@ -21,7 +19,6 @@ import {
   TrendingUp,
   Award,
   Truck,
-  RotateCcw,
   Star,
   MapPin,
   CreditCard,
@@ -131,10 +128,7 @@ interface CustomerSidebarProps {
   onClose?: () => void;
 }
 
-export function CustomerSidebar({
-  isOpen = true,
-  onClose,
-}: CustomerSidebarProps) {
+export function CustomerSidebar({}: CustomerSidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -183,13 +177,13 @@ export function CustomerSidebar({
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:relative left-0 top-0 h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white border-r border-slate-700 transition-all duration-300 overflow-y-auto ${
+        className={`fixed md:relative left-0 top-0 h-screen bg-linear-to-b from-slate-900 to-slate-800 text-white border-r border-slate-700 transition-all duration-300 overflow-y-auto ${
           isMobileOpen ? "w-64 z-40" : "w-0 md:w-64"
         }`}
       >
         {/* Header */}
         <div className="sticky top-0 bg-slate-900 p-6 border-b border-slate-700">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             ShopHub
           </h1>
           <p className="text-sm text-slate-400 mt-1">Customer Portal</p>
@@ -198,16 +192,16 @@ export function CustomerSidebar({
         <div className="p-6 space-y-6">
           {/* User Info Card */}
           {session?.user && (
-            <div className="p-4 bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg border border-slate-600 hover:border-slate-500 transition">
+            <div className="p-4 bg-linear-to-br from-slate-700 to-slate-800 rounded-lg border border-slate-600 hover:border-slate-500 transition">
               <div className="flex items-center gap-3">
-                {session.user.image ? (
+                {"image" in session.user && session.user.image ? (
                   <img
-                    src={session.user.image}
+                    src={String(session.user.image)}
                     alt={session.user.name}
                     className="w-12 h-12 rounded-full object-cover ring-2 ring-blue-400"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center font-bold">
+                  <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-400 to-cyan-400 flex items-center justify-center font-bold">
                     {session.user.name?.[0]?.toUpperCase()}
                   </div>
                 )}
@@ -260,11 +254,11 @@ export function CustomerSidebar({
                       }
                       className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition ${
                         isItemActive
-                          ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white"
+                          ? "bg-linear-to-r from-blue-600 to-cyan-600 text-white"
                           : "text-slate-300 hover:bg-slate-700"
                       }`}
                     >
-                      <Icon size={20} className="flex-shrink-0" />
+                      <Icon size={20} className="shrink-0" />
                       <span className="flex-1 text-left font-medium">
                         {item.label}
                       </span>
@@ -281,11 +275,11 @@ export function CustomerSidebar({
                       onClick={() => setIsMobileOpen(false)}
                       className={`flex items-center gap-3 px-3 py-3 rounded-lg transition ${
                         isItemActive
-                          ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white"
+                          ? "bg-linear-to-r from-blue-600 to-cyan-600 text-white"
                           : "text-slate-300 hover:bg-slate-700"
                       }`}
                     >
-                      <Icon size={20} className="flex-shrink-0" />
+                      <Icon size={20} className="shrink-0" />
                       <span className="font-medium">{item.label}</span>
                     </Link>
                   )}
@@ -337,11 +331,11 @@ export function CustomerSidebar({
                   onClick={() => setIsMobileOpen(false)}
                   className={`flex items-center gap-3 px-3 py-3 rounded-lg transition ${
                     isItemActive
-                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white"
+                      ? "bg-linear-to-r from-blue-600 to-cyan-600 text-white"
                       : "text-slate-300 hover:bg-slate-700"
                   }`}
                 >
-                  <Icon size={20} className="flex-shrink-0" />
+                  <Icon size={20} className="shrink-0" />
                   <span className="font-medium">{item.label}</span>
                 </Link>
               );
@@ -352,7 +346,7 @@ export function CustomerSidebar({
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-medium transition disabled:opacity-50 disabled:cursor-not-allowed border border-red-500"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-medium transition disabled:opacity-50 disabled:cursor-not-allowed border border-red-500"
           >
             <LogOut size={20} />
             <span>{isLoggingOut ? "Keluar..." : "Keluar"}</span>

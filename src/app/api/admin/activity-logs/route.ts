@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { ApiResponse, handleError } from '@/lib/api/response';
 import { ApiError } from '@/lib/api/errors';
 import { paginationSchema } from '@/lib/validations';
+import { Prisma } from '@prisma/client';
 
 /**
  * GET /api/admin/activity-logs
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
     startDate.setDate(startDate.getDate() - days);
 
     const skip = (params.page - 1) * params.limit;
-    const where: any = {
+    const where: Prisma.activity_logsWhereInput = {
       created_at: { gte: startDate },
     };
 

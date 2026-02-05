@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (Object.keys(errors).length > 0) {
-      throw new ApiError('VALIDATION_ERROR', 'Validation failed', 400, errors);
+      throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR', errors);
     }
 
     // Get cart with items
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!cart || cart.cart_items.length === 0) {
-      throw new ApiError('NOT_FOUND', 'Cart is empty', 400);
+      throw new ApiError(400, 'Cart is empty', 'NOT_FOUND');
     }
 
     // Verify shipping address
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!address) {
-      throw new ApiError('NOT_FOUND', 'Shipping address not found', 404);
+      throw new ApiError(404, 'Shipping address not found', 'NOT_FOUND');
     }
 
     // Calculate totals

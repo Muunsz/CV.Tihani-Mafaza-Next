@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ApiError } from './errors';
-import { ZodError } from 'zod';
+import { ZodError, type ZodIssue } from 'zod';
 
 // Standard API Response Type
 export interface ApiResponse<T = unknown> {
@@ -116,7 +116,7 @@ export function handleError(error: unknown): NextResponse {
   if (error instanceof ApiError) {
     return ApiResponse.error(
       error.message,
-      error.status,
+      error.statusCode,
       error.code,
       error.details
     );
@@ -124,8 +124,8 @@ export function handleError(error: unknown): NextResponse {
 
   // Handle Zod Validation Error
   if (error instanceof ZodError) {
-    const details = error.errors.reduce(
-      (acc, err) => {
+    const details = error.issues.reduce(
+      (acc: Record<string, string>, err: ZodIssue) => {
         const path = err.path.join('.');
         acc[path] = err.message;
         return acc;

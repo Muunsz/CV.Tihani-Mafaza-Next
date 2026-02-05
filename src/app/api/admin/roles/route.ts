@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const role = request.headers.get('x-user-role');
 
     if (role !== 'admin') {
-      throw new ApiError('UNAUTHORIZED', 'Admin access required', 403);
+      throw new ApiError(403, 'Admin access required', 'UNAUTHORIZED');
     }
 
     const roles = await prisma.roles.findMany({
@@ -39,13 +39,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (role !== 'admin') {
-      throw new ApiError('UNAUTHORIZED', 'Admin access required', 403);
+      throw new ApiError(403, 'Admin access required', 'UNAUTHORIZED');
     }
 
     const { name, description, permissions } = body;
 
     if (!name) {
-      throw new ApiError('VALIDATION_ERROR', 'Role name is required', 400);
+      throw new ApiError(400, 'Role name is required', 'VALIDATION_ERROR');
     }
 
     const newRole = await prisma.roles.create({

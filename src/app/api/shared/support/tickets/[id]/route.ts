@@ -23,19 +23,19 @@ export async function GET(
     const ticket = await prisma.support_tickets.findUnique({
       where: { id: parseInt(id) },
       include: {
-        support_messages: {
+        support_ticket_messages: {
           include: {
             users: {
               select: {
                 id: true,
                 full_name: true,
-                profile_image_url: true,
+                avatar_url: true,
               },
             },
           },
           orderBy: { created_at: 'asc' },
         },
-        users: {
+        users_support_tickets_user_idTousers: {
           select: {
             id: true,
             full_name: true,
@@ -89,7 +89,7 @@ export async function POST(
     const validatedData = addMessageSchema.parse(body);
 
     // Add message
-    const message = await prisma.support_messages.create({
+    const message = await prisma.support_ticket_messages.create({
       data: {
         ticket_id: parseInt(id),
         user_id: parseInt(userId),
@@ -100,7 +100,7 @@ export async function POST(
           select: {
             id: true,
             full_name: true,
-            profile_image_url: true,
+            avatar_url: true,
           },
         },
       },

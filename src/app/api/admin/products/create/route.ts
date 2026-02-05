@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { ApiError, handleApiError, ValidationError } from '@/lib/api/errors';
-import { productCreateSchema } from '@/lib/validations';
+import { productCreateSchema, type ProductCreate } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,11 +17,6 @@ export async function POST(request: NextRequest) {
     // Validate request body
     const validationResult = productCreateSchema.safeParse(body);
     if (!validationResult.success) {
-      const errors: Record<string, string> = {};
-      validationResult.error.errors.forEach((err) => {
-        const field = err.path.join('.');
-        errors[field] = err.message;
-      });
       return errorResponse('Validation failed', 400, 'VALIDATION_ERROR');
     }
 
@@ -40,6 +35,7 @@ export async function POST(request: NextRequest) {
     const product = await prisma.products.create({
       data: {
         name: data.name,
+        slug: data.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
         description: data.description,
         sku: data.sku || `SKU-${Date.now()}`,
         price: data.price,
@@ -50,7 +46,7 @@ export async function POST(request: NextRequest) {
         is_active: data.is_active !== false,
       },
       include: {
-        category: {
+        categories: {
           select: {
             id: true,
             name: true,

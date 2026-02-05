@@ -32,7 +32,7 @@ export async function GET() {
     });
 
     // Get testimonials
-    const testimonials = await prisma.reviews.findMany({
+    const testimonials = await prisma.product_reviews.findMany({
       where: {
         rating: { gte: 4 },
       },

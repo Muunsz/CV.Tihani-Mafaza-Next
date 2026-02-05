@@ -11,7 +11,7 @@ export function requireAuth(handler: Function) {
       const userId = request.headers.get('x-user-id');
 
       if (!userId) {
-        throw new ApiError('UNAUTHORIZED', 'Authentication required', 401);
+        throw new ApiError(401, 'Authentication required', 'UNAUTHORIZED');
       }
 
       return handler(request, ...args);
@@ -32,9 +32,9 @@ export function requireRole(...roles: string[]) {
 
         if (!userRole || !roles.includes(userRole)) {
           throw new ApiError(
-            'FORBIDDEN',
+            403,
             `This action requires one of: ${roles.join(', ')}`,
-            403
+            'FORBIDDEN'
           );
         }
 
@@ -55,9 +55,9 @@ export function validateMethod(...methods: string[]) {
       try {
         if (!methods.includes(request.method)) {
           throw new ApiError(
-            'METHOD_NOT_ALLOWED',
+            405,
             `Method ${request.method} not allowed`,
-            405
+            'METHOD_NOT_ALLOWED'
           );
         }
 

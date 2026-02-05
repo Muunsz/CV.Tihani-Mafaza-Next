@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const role = request.headers.get('x-user-role');
 
     if (role !== 'admin') {
-      throw new ApiError('UNAUTHORIZED', 'Admin access required', 403);
+      throw new ApiError(403, 'Admin access required', 'UNAUTHORIZED');
     }
 
     const settings = await prisma.application_settings.findMany();
@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest) {
     const role = request.headers.get('x-user-role');
 
     if (role !== 'admin') {
-      throw new ApiError('UNAUTHORIZED', 'Admin access required', 403);
+      throw new ApiError(403, 'Admin access required', 'UNAUTHORIZED');
     }
 
     const body = await request.json();

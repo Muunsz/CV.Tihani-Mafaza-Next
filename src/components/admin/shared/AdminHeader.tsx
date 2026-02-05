@@ -9,6 +9,7 @@ import {
   LogOut,
   Smartphone,
   Monitor,
+  Menu,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
@@ -16,9 +17,16 @@ import { useState } from "react";
 interface AdminHeaderProps {
   title: string;
   subtitle?: string;
+  onMenuClick?: () => void;
+  role?: string;
 }
 
-export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
+export function AdminHeader({
+  title,
+  subtitle,
+  onMenuClick,
+  role,
+}: AdminHeaderProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
 
@@ -33,14 +41,29 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
     >
       <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         {/* Title Section */}
-        <div className="flex-1">
-          <h1
-            className="text-2xl sm:text-3xl font-bold"
-            style={{ color: COLORS.primary }}
-          >
-            {title}
-          </h1>
-          {subtitle && <p className="text-gray-600 text-sm mt-1">{subtitle}</p>}
+        <div className="flex-1 flex items-center gap-4">
+          {/* Mobile menu button */}
+          {onMenuClick && (
+            <button
+              onClick={onMenuClick}
+              className="p-2 rounded-md lg:hidden hover:bg-gray-100"
+              aria-label="Open menu"
+            >
+              <Menu size={20} style={{ color: COLORS.primary }} />
+            </button>
+          )}
+
+          <div>
+            <h1
+              className="text-2xl sm:text-3xl font-bold"
+              style={{ color: COLORS.primary }}
+            >
+              {title}
+            </h1>
+            {subtitle && (
+              <p className="text-gray-600 text-sm mt-1">{subtitle}</p>
+            )}
+          </div>
         </div>
 
         {/* Right Actions */}
@@ -100,7 +123,9 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
               </div>
               <div className="hidden sm:block text-left text-sm">
                 <p className="font-semibold" style={{ color: COLORS.primary }}>
-                  Admin
+                  {role
+                    ? role.charAt(0).toUpperCase() + role.slice(1)
+                    : "Admin"}
                 </p>
                 <p className="text-xs" style={{ color: COLORS.gray }}>
                   Tihani

@@ -19,7 +19,7 @@ export async function GET(
     const product = await prisma.products.findUnique({
       where: { id: productId },
       include: {
-        category: {
+        categories: {
           select: {
             id: true,
             name: true,
@@ -101,7 +101,7 @@ export async function PUT(
         ...(data.is_active !== undefined && { is_active: data.is_active }),
       },
       include: {
-        category: {
+        categories: {
           select: {
             id: true,
             name: true,

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const userId = request.headers.get('x-user-id');
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     const user = await prisma.users.findUnique({
@@ -22,10 +22,10 @@ export async function GET(request: NextRequest) {
         email: true,
         full_name: true,
         phone_number: true,
-        profile_image_url: true,
+        avatar_url: true,
         is_active: true,
         email_verified: true,
-        role: {
+        roles: {
           select: {
             id: true,
             name: true,
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      throw new ApiError('NOT_FOUND', 'User not found', 404);
+      throw new ApiError(404, 'User not found', 'NOT_FOUND');
     }
 
     return NextResponse.json(ApiResponse.success(user));
@@ -56,10 +56,10 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
-    const { full_name, phone_number, profile_image_url } = body;
+    const { full_name, phone_number, avatar_url } = body;
 
     // Validate input
     const errors: Record<string, string> = {};
@@ -71,7 +71,7 @@ export async function PUT(request: NextRequest) {
     }
 
     if (Object.keys(errors).length > 0) {
-      throw new ApiError('VALIDATION_ERROR', 'Validation failed', 400, errors);
+      throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR');
     }
 
     const updated = await prisma.users.update({
@@ -79,14 +79,14 @@ export async function PUT(request: NextRequest) {
       data: {
         ...(full_name && { full_name }),
         ...(phone_number && { phone_number }),
-        ...(profile_image_url && { profile_image_url }),
+        ...(avatar_url && { avatar_url }),
       },
       select: {
         id: true,
         email: true,
         full_name: true,
         phone_number: true,
-        profile_image_url: true,
+        avatar_url: true,
         updated_at: true,
       },
     });

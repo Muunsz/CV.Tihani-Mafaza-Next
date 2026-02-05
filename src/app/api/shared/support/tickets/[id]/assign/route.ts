@@ -9,12 +9,11 @@ import { ApiError } from '@/lib/api/errors';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const { id } = await params;
     const role = request.headers.get('x-user-role');
-    const userId = request.headers.get('x-user-id');
     const body = await request.json();
     const { assigned_to, priority } = body;
 
@@ -24,7 +23,7 @@ export async function POST(
 
     // Get ticket
     const ticket = await prisma.support_tickets.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     if (!ticket) {
@@ -35,21 +34,17 @@ export async function POST(
     if (assigned_to) {
       const user = await prisma.users.findUnique({
         where: { id: assigned_to },
-        include: { role: true },
+        include: { roles: true },
       });
 
-      if (!user || (user.role?.name !== 'staff' && user.role?.name !== 'admin')) {
-        throw new ApiError(
-          'INVALID_REQUEST',
-          'User is not staff member',
-          400
-        );
+      if (!user || (user.roles?.name !== 'staff' && user.roles?.name !== 'admin')) {
+        throw new ApiError(400, 'User is not staff member', 'INVALID_REQUEST');
       }
     }
 
     // Update ticket
     const updatedTicket = await prisma.support_tickets.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: {
         assigned_to: assigned_to || null,
         ...(priority && { priority }),

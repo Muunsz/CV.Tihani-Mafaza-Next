@@ -42,6 +42,10 @@ async function getHomepageData() {
       ...product,
       price: Number(product.price),
       rating: Number(product.rating),
+      discount_percentage: product.discount_percentage ?? 0,
+      stock_quantity: product.stock_quantity ?? 0,
+      is_featured: product.is_featured === true,
+      review_count: product.review_count ?? 0,
     }));
 
     // Get testimonials
@@ -68,6 +72,13 @@ async function getHomepageData() {
       take: 6,
     });
 
+    // Map testimonials to ensure title is never null
+    const processedTestimonials = testimonials.map((t) => ({
+      ...t,
+      title: t.title ?? "Testimoni Pelanggan",
+      review_text: t.review_text ?? "",
+    }));
+
     return {
       statistics: {
         totalUsers: totalUsers + 100, // Add some buffer for display
@@ -76,7 +87,7 @@ async function getHomepageData() {
         totalPartners: totalPartners + 75,
       },
       featuredProducts: processedProducts,
-      testimonials,
+      testimonials: processedTestimonials,
     };
   } catch (error) {
     console.error("Error fetching homepage data:", error);

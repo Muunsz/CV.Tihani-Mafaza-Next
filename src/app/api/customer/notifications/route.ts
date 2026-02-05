@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const isRead = searchParams.get('is_read');
 
     const skip = (params.page - 1) * params.limit;
-    const where: any = { user_id: parseInt(userId) };
+    const where: { user_id: number; is_read?: boolean } = { user_id: parseInt(userId) };
 
     if (isRead !== null) {
       where.is_read = isRead === 'true';
@@ -72,9 +72,9 @@ export async function POST(request: NextRequest) {
 
     if (!Array.isArray(notification_ids) || notification_ids.length === 0) {
       throw new ApiError(
-        'VALIDATION_ERROR',
+        400,
         'Notification IDs array is required',
-        400
+        'VALIDATION_ERROR'
       );
     }
 

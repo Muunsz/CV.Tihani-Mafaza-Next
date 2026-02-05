@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "@/lib/prisma"
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import type { Adapter } from '@auth/core/adapters';
+import { prisma } from "@/lib/prisma";
 import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
@@ -15,10 +16,9 @@ async function comparePasswords(plain: string, hashed: string) {
   }
 }
 
-const isDevelopment = process.env.NODE_ENV === "development";
 
 export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as unknown as Adapter,
   basePath: "/api/guest/auth",
   secret: process.env.NEXTAUTH_SECRET,
   trustHost: true,
@@ -46,7 +46,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
           }
 
           const user = await prisma.users.findUnique({
-            where: { email: credentials.email },
+            where: { email: credentials.email as string },
             include: { roles: true }
           });
 
@@ -61,7 +61,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
             return null;
           }
 
-          const isPasswordValid = await comparePasswords(credentials.password, user.password_hash);
+          const isPasswordValid = await comparePasswords(credentials.password as string, user.password_hash);
 
           if (!isPasswordValid) {
             console.log("[AUTH] Invalid password");
@@ -93,7 +93,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
     error: "/guest/auth/login",
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       try {
         if (account?.provider === 'google') {
           // Check if user exists
@@ -186,7 +186,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
       }
       return session;
     },
-    async redirect({ url, baseUrl, user }) {
+    async redirect({ url, baseUrl, user }: { url?: string; baseUrl: string; user?: { role?: string } | null }) {
       // If callback URL is provided, use it
       if (url && url !== baseUrl) {
         try {
@@ -218,9 +218,9 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
     },
   },
   events: {
-    async signOut({ token }) {
+    async signOut(payload: { token?: { email?: string | null } | null; session?: unknown }) {
       try {
-        console.log("[AUTH_EVENTS] User signed out:", token?.email);
+        console.log("[AUTH_EVENTS] User signed out:", payload.token?.email);
         // Clear any additional data if needed
       } catch (error) {
         console.error("[AUTH_EVENTS] SignOut error:", error);

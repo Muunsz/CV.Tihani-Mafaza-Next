@@ -50,12 +50,17 @@ export function rateLimit(
 /**
  * Middleware to apply rate limiting
  */
+type ApiHandler = (
+  request: NextRequest,
+  ...args: unknown[]
+) => Promise<NextResponse | Response> | NextResponse | Response
+
 export function withRateLimit(
   limit: number = 100,
   windowMs: number = 60 * 1000
 ) {
-  return (handler: Function) => {
-    return async (request: NextRequest, ...args: any[]) => {
+  return (handler: ApiHandler) => {
+    return async (request: NextRequest, ...args: unknown[]) => {
       const userId = request.headers.get('x-user-id');
       const ip = request.headers.get('x-forwarded-for') || 'unknown';
       const identifier = userId || ip;

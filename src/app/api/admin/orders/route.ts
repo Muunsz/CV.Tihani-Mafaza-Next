@@ -2,10 +2,11 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ApiResponse, handleError } from '@/lib/api/response';
 import { ApiError } from '@/lib/api/errors';
+import { Prisma } from '@prisma/client';
 
 async function verifyAdminAccess(userId: string | null) {
   if (!userId) {
-    throw new ApiError('Unauthorized', 401, 'UNAUTHORIZED');
+    throw new ApiError(401, 'Unauthorized', 'UNAUTHORIZED');
   }
 
   const user = await prisma.users.findUnique({
@@ -14,7 +15,7 @@ async function verifyAdminAccess(userId: string | null) {
   });
 
   if (!user || !['admin', 'staff'].includes(user.roles?.name || '')) {
-    throw new ApiError('Forbidden', 403, 'FORBIDDEN');
+    throw new ApiError(403, "Forbidden", "FORBIDDEN");
   }
 }
 
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.ordersWhereInput = {};
     if (status) {
       where.order_status = status;
     }
@@ -80,3 +81,4 @@ export async function GET(request: NextRequest) {
     return handleError(error);
   }
 }
+

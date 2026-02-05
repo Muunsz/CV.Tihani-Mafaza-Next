@@ -12,7 +12,7 @@ const updateUserSchema = z.object({
 
 async function verifyAdminAccess(userId: string | null) {
   if (!userId) {
-    throw new ApiError('Unauthorized', 401, 'UNAUTHORIZED');
+    throw new ApiError(401, "Unauthorized", "UNAUTHORIZED");
   }
 
   const user = await prisma.users.findUnique({
@@ -21,7 +21,7 @@ async function verifyAdminAccess(userId: string | null) {
   });
 
   if (!user || user.roles?.name !== 'admin') {
-    throw new ApiError('Forbidden', 403, 'FORBIDDEN');
+    throw new ApiError(403, "Forbidden", "FORBIDDEN");
   }
 }
 
@@ -36,7 +36,11 @@ export async function GET(request: NextRequest) {
     const role = searchParams.get('role');
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: {
+      roles?: {
+        name: string;
+      };
+    } = {};
     if (role) {
       where.roles = { name: role };
     }
@@ -44,11 +48,7 @@ export async function GET(request: NextRequest) {
     const [users, total] = await Promise.all([
       prisma.users.findMany({
         where,
-        include: {
-          roles: {
-            select: { name: true },
-          },
-        },
+
         select: {
           id: true,
           email: true,
@@ -56,7 +56,9 @@ export async function GET(request: NextRequest) {
           is_active: true,
           created_at: true,
           last_login: true,
-          roles: true,
+          roles: {
+            select: { name: true },
+          },
         },
         skip,
         take: limit,
@@ -91,12 +93,12 @@ export async function PUT(request: NextRequest) {
     const { userId: targetUserId, ...updateData } = body;
 
     if (!targetUserId) {
-      throw new ApiError('User ID is required', 400, 'MISSING_ID');
+      throw new ApiError(400, "User ID is required", "MISSING_ID");
     }
 
     // Prevent self-modification of role
-    if (parseInt(userId) === targetUserId && updateData.role_id) {
-      throw new ApiError('Cannot change your own role', 400, 'INVALID_ACTION');
+    if (parseInt(userId || '0') === targetUserId && updateData.role_id) {
+      throw new ApiError(400, "Cannot change your own role", "INVALID_ACTION");
     }
 
     const validatedData = updateUserSchema.parse(updateData);
@@ -107,17 +109,15 @@ export async function PUT(request: NextRequest) {
         ...validatedData,
         updated_at: new Date(),
       },
-      include: {
-        roles: {
-          select: { name: true },
-        },
-      },
+
       select: {
         id: true,
         email: true,
         full_name: true,
         is_active: true,
-        roles: true,
+        roles: {
+          select: { name: true },
+        },
       },
     });
 
@@ -126,3 +126,4 @@ export async function PUT(request: NextRequest) {
     return handleError(error);
   }
 }
+

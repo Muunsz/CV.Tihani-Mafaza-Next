@@ -1,16 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { RoleLayout } from "@/components/admin/RoleLayout";
 import { COLORS } from "@/lib/constants";
 import {
-  ShoppingCart,
   CheckCircle,
   Clock,
   AlertCircle,
   TrendingUp,
   Users,
-  Package,
   Eye,
   Download,
 } from "lucide-react";
@@ -96,7 +93,8 @@ const stats = [
 ];
 
 function StaffDashboard() {
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  type Order = (typeof pendingOrders)[number] | (typeof approvedOrders)[number];
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [filter, setFilter] = useState("pending");
 
   const handleApproveOrder = (orderId: string) => {
@@ -158,10 +156,7 @@ function StaffDashboard() {
       {/* Orders Management Section */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2
-            className="text-2xl font-bold"
-            style={{ color: COLORS.primary }}
-          >
+          <h2 className="text-2xl font-bold" style={{ color: COLORS.primary }}>
             Manajemen Pesanan
           </h2>
           <div className="flex gap-2">
@@ -173,7 +168,8 @@ function StaffDashboard() {
                   : "border border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
               style={{
-                backgroundColor: filter === "pending" ? COLORS.accent : undefined,
+                backgroundColor:
+                  filter === "pending" ? COLORS.accent : undefined,
               }}
             >
               <Clock size={16} className="inline mr-1" />
@@ -228,10 +224,7 @@ function StaffDashboard() {
                 </thead>
                 <tbody className="divide-y">
                   {pendingOrders.map((order) => (
-                    <tr
-                      key={order.id}
-                      className="hover:bg-gray-50 transition"
-                    >
+                    <tr key={order.id} className="hover:bg-gray-50 transition">
                       <td className="px-6 py-4 font-semibold text-sm">
                         {order.id}
                       </td>
@@ -311,10 +304,7 @@ function StaffDashboard() {
                 </thead>
                 <tbody className="divide-y">
                   {approvedOrders.map((order) => (
-                    <tr
-                      key={order.id}
-                      className="hover:bg-gray-50 transition"
-                    >
+                    <tr key={order.id} className="hover:bg-gray-50 transition">
                       <td className="px-6 py-4 font-semibold text-sm">
                         {order.id}
                       </td>
@@ -394,7 +384,9 @@ function StaffDashboard() {
                   Detail Pesanan
                 </p>
                 <p className="text-sm mt-2 text-gray-700">
-                  {selectedOrder.details}
+                  {"details" in selectedOrder && selectedOrder.details
+                    ? selectedOrder.details
+                    : "-"}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">
                   Jumlah Item: {selectedOrder.items}
@@ -413,18 +405,14 @@ function StaffDashboard() {
 
               <div className="flex gap-3 pt-4 border-t">
                 <button
-                  onClick={() =>
-                    handleApproveOrder(selectedOrder.id)
-                  }
+                  onClick={() => handleApproveOrder(selectedOrder.id)}
                   className="flex-1 py-2.5 font-semibold rounded-lg text-white transition hover:shadow-lg"
                   style={{ backgroundColor: "#10b981" }}
                 >
                   Setujui Pesanan
                 </button>
                 <button
-                  onClick={() =>
-                    handleRejectOrder(selectedOrder.id)
-                  }
+                  onClick={() => handleRejectOrder(selectedOrder.id)}
                   className="flex-1 py-2.5 font-semibold rounded-lg text-white bg-red-600 hover:bg-red-700 transition"
                 >
                   Tolak Pesanan

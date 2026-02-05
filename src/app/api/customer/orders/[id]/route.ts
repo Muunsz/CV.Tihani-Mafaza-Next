@@ -9,31 +9,31 @@ import { ApiError } from '@/lib/api/errors';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    const { id } = await params;
     const userId = request.headers.get('x-user-id');
+    const { id } = await params;
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     const order = await prisma.orders.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       include: {
         order_items: {
           include: {
-            product: {
+            products: {
               select: {
                 id: true,
                 name: true,
-                image_url: true,
+                // image_url: true, // remove if not in schema
               },
             },
           },
         },
-        shipping_address: {
+        user_addresses: {
           select: {
             full_name: true,
             phone_number: true,
@@ -47,12 +47,12 @@ export async function GET(
     });
 
     if (!order) {
-      throw new ApiError('NOT_FOUND', 'Order not found', 404);
+      throw new ApiError(404, 'Order not found', 'NOT_FOUND');
     }
 
     // Verify ownership
     if (order.user_id !== parseInt(userId)) {
-      throw new ApiError('FORBIDDEN', 'Cannot access this order', 403);
+      throw new ApiError(403, 'Cannot access this order', 'FORBIDDEN');
     }
 
     return NextResponse.json(ApiResponse.success(order));
@@ -67,15 +67,15 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    const { id } = await params;
     const userRole = request.headers.get('x-user-role');
+    const { id } = await params;
     const body = await request.json();
 
     if (userRole !== 'admin' && userRole !== 'staff') {
-      throw new ApiError('FORBIDDEN', 'Only admins can update orders', 403);
+      throw new ApiError(403, 'Only admins can update orders', 'FORBIDDEN');
     }
 
     const { order_status, payment_status, tracking_number } = body;
@@ -93,20 +93,22 @@ export async function PUT(
 
     if (order_status && !validOrderStatuses.includes(order_status)) {
       throw new ApiError(
-        'VALIDATION_ERROR',
-        'Invalid order status'
+        400,
+        'Invalid order status',
+        'VALIDATION_ERROR'
       );
     }
 
     if (payment_status && !validPaymentStatuses.includes(payment_status)) {
       throw new ApiError(
-        'VALIDATION_ERROR',
-        'Invalid payment status'
+        400,
+        'Invalid payment status',
+        'VALIDATION_ERROR'
       );
     }
 
     const updated = await prisma.orders.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: {
         ...(order_status && { order_status }),
         ...(payment_status && { payment_status }),

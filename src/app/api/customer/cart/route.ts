@@ -14,24 +14,23 @@ export async function GET(request: NextRequest) {
 
     if (!userId && !sessionId) {
       throw new ApiError(
-        'UNAUTHORIZED',
+        401,
         'User ID or Session ID is required',
-        401
+        'UNAUTHORIZED'
       );
     }
 
-    const cart = await prisma.shoppingCart.findFirst({
+    const cart = await prisma.shopping_carts.findFirst({
       where: userId ? { user_id: parseInt(userId) } : { session_id: sessionId },
       include: {
         cart_items: {
           include: {
-            product: {
+            products: {
               select: {
                 id: true,
                 name: true,
                 price: true,
                 discount_percentage: true,
-                image_url: true,
                 stock_quantity: true,
               },
             },
@@ -55,9 +54,15 @@ export async function GET(request: NextRequest) {
       id: item.id,
       product_id: item.product_id,
       quantity: item.quantity,
-      price_at_add: item.price_at_add,
-      subtotal: item.quantity * item.price_at_add,
-      product: item.product,
+      price_at_add: item.price_at_add.toNumber(),
+      subtotal: item.quantity * item.price_at_add.toNumber(),
+      product: {
+        id: item.products.id,
+        name: item.products.name,
+        price: item.products.price,
+        discount_percentage: item.products.discount_percentage,
+        stock_quantity: item.products.stock_quantity ?? 0,
+      },
     }));
 
     return NextResponse.json(
@@ -86,16 +91,17 @@ export async function POST(request: NextRequest) {
 
     if (!product_id || !quantity) {
       throw new ApiError(
-        'VALIDATION_ERROR',
-        'Product ID and quantity are required'
+        400,
+        'Product ID and quantity are required',
+        'VALIDATION_ERROR'
       );
     }
 
     if (!userId && !sessionId) {
       throw new ApiError(
-        'UNAUTHORIZED',
+        401,
         'User ID or Session ID is required',
-        401
+        'UNAUTHORIZED'
       );
     }
 
@@ -105,24 +111,24 @@ export async function POST(request: NextRequest) {
     });
 
     if (!product) {
-      throw new ApiError('NOT_FOUND', 'Product not found', 404);
+      throw new ApiError(404, 'Product not found', 'NOT_FOUND');
     }
 
-    if (product.stock_quantity < quantity) {
+    if ((product.stock_quantity ?? 0) < quantity) {
       throw new ApiError(
-        'INSUFFICIENT_STOCK',
-        `Only ${product.stock_quantity} items available`,
-        400
+        400,
+        `Only ${product.stock_quantity ?? 0} items available`,
+        'INSUFFICIENT_STOCK'
       );
     }
 
     // Get or create cart
-    let cart = await prisma.shoppingCart.findFirst({
+    let cart = await prisma.shopping_carts.findFirst({
       where: userId ? { user_id: parseInt(userId) } : { session_id: sessionId },
     });
 
     if (!cart) {
-      cart = await prisma.shoppingCart.create({
+      cart = await prisma.shopping_carts.create({
         data: {
           user_id: userId ? parseInt(userId) : null,
           session_id: sessionId,
@@ -165,11 +171,11 @@ export async function POST(request: NextRequest) {
     });
 
     const totalPrice = items.reduce(
-      (sum, item) => sum + item.price_at_add * item.quantity,
+      (sum, item) => sum + item.price_at_add.toNumber() * item.quantity,
       0
     );
 
-    await prisma.shoppingCart.update({
+    await prisma.shopping_carts.update({
       where: { id: cart.id },
       data: { total_price: totalPrice },
     });

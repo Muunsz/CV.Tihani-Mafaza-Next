@@ -22,7 +22,7 @@ async function verifyAdminAccess(userId: string | null) {
   });
 
   if (!user || !['admin', 'staff'].includes(user.roles?.name || '')) {
-    throw new ApiError('Forbidden', 403, 'FORBIDDEN');
+    throw new ApiError(403, 'Forbidden', 'FORBIDDEN');
   }
 }
 
@@ -51,7 +51,7 @@ export async function GET(
     });
 
     if (!order) {
-      throw new ApiError('Order not found', 404, 'NOT_FOUND');
+      throw new ApiError(404, 'Order not found', 'NOT_FOUND');
     }
 
     return ApiResponse.success(order, 200);

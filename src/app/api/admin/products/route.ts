@@ -16,7 +16,7 @@ const updateProductSchema = z.object({
 // Middleware-like check for admin role
 async function verifyAdminAccess(userId: string | null) {
   if (!userId) {
-    throw new ApiError('Unauthorized', 401, 'UNAUTHORIZED');
+    throw new ApiError(401, "Unauthorized", "UNAUTHORIZED");
   }
 
   const user = await prisma.users.findUnique({
@@ -25,7 +25,7 @@ async function verifyAdminAccess(userId: string | null) {
   });
 
   if (!user || user.roles?.name !== 'admin') {
-    throw new ApiError('Forbidden - Admin access required', 403, 'FORBIDDEN');
+    throw new ApiError(403, "Forbidden - Admin access required", "FORBIDDEN");
   }
 }
 
@@ -80,7 +80,7 @@ export async function PUT(request: NextRequest) {
     const { productId, ...updateData } = body;
 
     if (!productId) {
-      throw new ApiError('Product ID is required', 400, 'MISSING_ID');
+      throw new ApiError(400, "Product ID is required", "MISSING_ID");
     }
 
     const validatedData = updateProductSchema.parse(updateData);
@@ -90,7 +90,7 @@ export async function PUT(request: NextRequest) {
       validatedData.stock_quantity !== undefined &&
       validatedData.stock_quantity > 10000
     ) {
-      throw new ApiError('Stock quantity exceeds warehouse capacity', 400, 'INVALID_STOCK');
+      throw new ApiError(400, "Stock quantity exceeds warehouse capacity", "INVALID_STOCK");
     }
 
     const product = await prisma.products.update({
@@ -110,3 +110,4 @@ export async function PUT(request: NextRequest) {
     return handleError(error);
   }
 }
+

@@ -35,8 +35,8 @@ export function PartnersSection() {
         <div className="mt-16 p-8 rounded-lg bg-gradient-to-r from-blue-50 to-orange-50 border border-gray-200">
           <div className="flex flex-col items-center text-center">
             <p className="text-lg text-gray-700 italic mb-4">
-              "Kepercayaan klien adalah aset terbesar kami. Setiap transaksi adalah kesempatan
-              untuk membuktikan komitmen kami terhadap keunggulan layanan."
+              &quot;Kepercayaan klien adalah aset terbesar kami. Setiap transaksi adalah kesempatan
+              untuk membuktikan komitmen kami terhadap keunggulan layanan.&quot;
             </p>
             <div
               className="w-1 h-1 rounded-full mb-4"

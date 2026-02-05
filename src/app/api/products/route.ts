@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { successResponse, errorResponse } from '@/lib/api/response';
-import { ApiError, handleApiError } from '@/lib/api/errors';
-import { paginationSchema, productFilterSchema } from '@/lib/validations';
+import { handleApiError } from '@/lib/api/errors';
+import { paginationSchema } from '@/lib/validations';
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     const skip = (validPage - 1) * validLimit;
 
     // Build where clause
-    const where: any = { is_active: true };
+    const where: { is_active: boolean; category_id?: number; is_featured?: boolean; OR?: { name?: { contains: string; mode: 'insensitive' }; description?: { contains: string; mode: 'insensitive' } }[] } = { is_active: true };
 
     if (categoryId) {
       where.category_id = parseInt(categoryId);
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build order by
-    const orderByMap: Record<string, any> = {
+    const orderByMap: Record<string, Record<string, string>> = {
       name: { name: sortOrder },
       price: { price: sortOrder },
       created_at: { created_at: sortOrder },
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
         is_featured: true,
         rating: true,
         review_count: true,
-        category: {
+        categories: {
           select: {
             id: true,
             name: true,

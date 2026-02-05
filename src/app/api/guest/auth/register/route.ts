@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
         email: validatedData.email,
         password_hash: hashedPassword,
         full_name: validatedData.fullName,
-        phone_number: validatedData.phone,
+        phone_number: validatedData.phone_number,
         role_id: 3, // Customer
         email_verified: false,
       },

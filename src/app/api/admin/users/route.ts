@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const role = request.headers.get('x-user-role');
 
     if (!userId || role !== 'admin') {
-      throw new ApiError('UNAUTHORIZED', 'Admin access required', 403);
+      throw new ApiError(403, 'Admin access required', 'UNAUTHORIZED');
     }
 
     const { searchParams } = new URL(request.url);
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
           phone_number: true,
           is_active: true,
           email_verified: true,
-          role: {
+          roles: {
             select: {
               id: true,
               name: true,

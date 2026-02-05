@@ -46,35 +46,35 @@ export async function POST(request: NextRequest) {
     });
 
     if (!promotion) {
-      throw new ApiError('Invalid promotion code', 404, 'CODE_NOT_FOUND');
+      throw new ApiError(404, "Invalid promotion code", "CODE_NOT_FOUND");
     }
 
     if (!promotion.is_active) {
-      throw new ApiError('Promotion is not active', 400, 'CODE_INACTIVE');
+      throw new ApiError(400, "Promotion is not active", "CODE_INACTIVE");
     }
 
     // Check date validity
     const now = new Date();
     if (promotion.valid_from > now || promotion.valid_until < now) {
-      throw new ApiError('Promotion code is expired', 400, 'CODE_EXPIRED');
+      throw new ApiError(400, "Promotion code is expired", "CODE_EXPIRED");
     }
 
     // Check usage limit
     if (
       promotion.usage_limit &&
-      promotion.usage_count >= promotion.usage_limit
+      (promotion.usage_count || 0) >= promotion.usage_limit
     ) {
-      throw new ApiError('Promotion code has reached usage limit', 400, 'LIMIT_REACHED');
+      throw new ApiError(400, "Promotion code has reached usage limit", "LIMIT_REACHED");
     }
 
     // Check minimum purchase
     if (
       promotion.min_purchase_amount &&
-      validatedData.cartTotal < promotion.min_purchase_amount
+      validatedData.cartTotal < promotion.min_purchase_amount.toNumber()
     ) {
       throw new ApiError(
-        `Minimum purchase ${promotion.min_purchase_amount} required`,
         400,
+        `Minimum purchase ${promotion.min_purchase_amount} required`,
         'MIN_PURCHASE_NOT_MET'
       );
     }
@@ -82,15 +82,15 @@ export async function POST(request: NextRequest) {
     // Calculate discount
     let discountAmount = 0;
     if (promotion.discount_type === 'percentage') {
-      discountAmount = (validatedData.cartTotal * promotion.discount_value) / 100;
+      discountAmount = (validatedData.cartTotal * promotion.discount_value.toNumber()) / 100;
       if (promotion.max_discount_amount) {
         discountAmount = Math.min(
           discountAmount,
-          promotion.max_discount_amount
+          promotion.max_discount_amount.toNumber()
         );
       }
     } else {
-      discountAmount = promotion.discount_value;
+      discountAmount = promotion.discount_value.toNumber();
     }
 
     return ApiResponse.success(
@@ -108,3 +108,4 @@ export async function POST(request: NextRequest) {
     return handleError(error);
   }
 }
+

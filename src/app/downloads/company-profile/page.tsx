@@ -33,7 +33,8 @@ const documents: DocumentItem[] = [
   {
     id: 1,
     title: "Company Profile Lengkap",
-    description: "Dokumentasi lengkap tentang CV. Tihani Mafaza beserta sejarah, visi, misi, dan pencapaian",
+    description:
+      "Dokumentasi lengkap tentang CV. Tihani Mafaza beserta sejarah, visi, misi, dan pencapaian",
     fileSize: "3.5 MB",
     downloadUrl: "/files/company/profile-lengkap.pdf",
     type: "PDF",
@@ -41,7 +42,8 @@ const documents: DocumentItem[] = [
   {
     id: 2,
     title: "Daftar Produk & Layanan",
-    description: "Katalog lengkap semua produk dan layanan yang kami tawarkan dengan detail spesifikasi",
+    description:
+      "Katalog lengkap semua produk dan layanan yang kami tawarkan dengan detail spesifikasi",
     fileSize: "2.8 MB",
     downloadUrl: "/files/company/produk-layanan.pdf",
     type: "PDF",
@@ -49,7 +51,8 @@ const documents: DocumentItem[] = [
   {
     id: 3,
     title: "Pengalaman & Portofolio",
-    description: "Daftar pengalaman kami melayani klien korporat dan instansi pemerintah",
+    description:
+      "Daftar pengalaman kami melayani klien korporat dan instansi pemerintah",
     fileSize: "4.2 MB",
     downloadUrl: "/files/company/pengalaman-portfolio.pdf",
     type: "PDF",
@@ -57,7 +60,8 @@ const documents: DocumentItem[] = [
   {
     id: 4,
     title: "Tim & Struktur Organisasi",
-    description: "Informasi tentang tim profesional kami dan struktur organisasi perusahaan",
+    description:
+      "Informasi tentang tim profesional kami dan struktur organisasi perusahaan",
     fileSize: "1.5 MB",
     downloadUrl: "/files/company/tim-organisasi.pdf",
     type: "PDF",
@@ -65,7 +69,8 @@ const documents: DocumentItem[] = [
   {
     id: 5,
     title: "Sertifikasi & Penghargaan",
-    description: "Dokumentasi sertifikasi ISO, penghargaan, dan akreditasi yang telah diraih",
+    description:
+      "Dokumentasi sertifikasi ISO, penghargaan, dan akreditasi yang telah diraih",
     fileSize: "2.3 MB",
     downloadUrl: "/files/company/sertifikasi.pdf",
     type: "PDF",
@@ -73,7 +78,8 @@ const documents: DocumentItem[] = [
   {
     id: 6,
     title: "Presentasi Bisnis",
-    description: "Slide presentasi lengkap untuk rapat klien dan proposal bisnis",
+    description:
+      "Slide presentasi lengkap untuk rapat klien dan proposal bisnis",
     fileSize: "5.1 MB",
     downloadUrl: "/files/company/presentasi-bisnis.ppt",
     type: "PPT",
@@ -90,7 +96,7 @@ function DocumentCard({ document }: { document: DocumentItem }) {
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
+        const link = window.document.createElement("a");
         link.href = url;
         link.download = document.downloadUrl.split("/").pop() || "document.pdf";
         link.click();
@@ -122,7 +128,7 @@ function DocumentCard({ document }: { document: DocumentItem }) {
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-4">
           <div
-            className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+            className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
             style={{ backgroundColor: COLORS.primary + "15" }}
           >
             <FileText size={24} style={{ color: COLORS.primary }} />
@@ -134,7 +140,9 @@ function DocumentCard({ document }: { document: DocumentItem }) {
             <p className="text-gray-600 text-sm">{document.description}</p>
           </div>
         </div>
-        <span className={`px-3 py-1 rounded-full text-xs font-bold ${getTypeColor(document.type)}`}>
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-bold ${getTypeColor(document.type)}`}
+        >
           {document.type}
         </span>
       </div>
@@ -174,7 +182,7 @@ export default function CompanyProfilePage() {
         if (response.ok) {
           const blob = await response.blob();
           const url = window.URL.createObjectURL(blob);
-          const link = document.createElement("a");
+          const link = window.document.createElement("a");
           link.href = url;
           link.download = doc.downloadUrl.split("/").pop() || "document.pdf";
           link.click();
@@ -231,18 +239,23 @@ export default function CompanyProfilePage() {
             <div>
               <h2 className="text-2xl font-bold mb-4">Tentang Kami</h2>
               <p className="text-gray-600 mb-4">
-                CV. Tihani Mafaza adalah perusahaan terpercaya yang telah melayani berbagai klien korporat dan instansi pemerintah sejak tahun 2005. Kami menyediakan solusi terpadu untuk kebutuhan bisnis Anda.
+                CV. Tihani Mafaza adalah perusahaan terpercaya yang telah
+                melayani berbagai klien korporat dan instansi pemerintah sejak
+                tahun 2005. Kami menyediakan solusi terpadu untuk kebutuhan
+                bisnis Anda.
               </p>
               <p className="text-gray-600 mb-6">
-                Dengan pengalaman lebih dari 15 tahun, tim profesional kami siap memberikan layanan terbaik dan hasil yang memuaskan untuk setiap proyek.
+                Dengan pengalaman lebih dari 15 tahun, tim profesional kami siap
+                memberikan layanan terbaik dan hasil yang memuaskan untuk setiap
+                proyek.
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
+            <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
               <h3 className="text-lg font-bold mb-6">Informasi Kontak</h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <MapPin size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <MapPin size={20} className="text-blue-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold">Alamat</p>
                     <p className="text-sm text-gray-700">
@@ -251,14 +264,14 @@ export default function CompanyProfilePage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Phone size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Phone size={20} className="text-blue-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold">Telepon</p>
                     <p className="text-sm text-gray-700">+62-21-1234-5678</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Mail size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Mail size={20} className="text-blue-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold">Email</p>
                     <p className="text-sm text-gray-700">
@@ -267,7 +280,7 @@ export default function CompanyProfilePage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Globe size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Globe size={20} className="text-blue-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold">Website</p>
                     <p className="text-sm text-gray-700">
@@ -283,14 +296,16 @@ export default function CompanyProfilePage() {
 
       <div className="bg-white border-b border-gray-200 py-12">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-8 text-center">Pencapaian Kami</h2>
+          <h2 className="text-2xl font-bold mb-8 text-center">
+            Pencapaian Kami
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
                 <div
                   key={index}
-                  className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 text-center border border-gray-200"
+                  className="bg-linear-to-br from-gray-50 to-gray-100 rounded-lg p-6 text-center border border-gray-200"
                 >
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -312,7 +327,8 @@ export default function CompanyProfilePage() {
           Download Dokumentasi Perusahaan
         </h2>
         <p className="text-gray-600 mb-8">
-          Semua dokumen di bawah dapat diunduh untuk keperluan bisnis Anda. Pilih dokumen yang Anda butuhkan atau unduh semua sekaligus.
+          Semua dokumen di bawah dapat diunduh untuk keperluan bisnis Anda.
+          Pilih dokumen yang Anda butuhkan atau unduh semua sekaligus.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -346,7 +362,10 @@ export default function CompanyProfilePage() {
             ].map((service, index) => {
               const Icon = service.icon;
               return (
-                <div key={index} className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                <div
+                  key={index}
+                  className="bg-gray-50 rounded-lg p-6 border border-gray-200"
+                >
                   <Icon
                     size={32}
                     className="mb-4"
@@ -361,14 +380,12 @@ export default function CompanyProfilePage() {
         </div>
       </div>
 
-      <div
-        className="py-16"
-        style={{ backgroundColor: COLORS.primary + "08" }}
-      >
+      <div className="py-16" style={{ backgroundColor: COLORS.primary + "08" }}>
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Mari Bekerja Sama</h2>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            Hubungi kami untuk mendiskusikan bagaimana kami dapat membantu mencapai tujuan bisnis Anda
+            Hubungi kami untuk mendiskusikan bagaimana kami dapat membantu
+            mencapai tujuan bisnis Anda
           </p>
           <Link
             href="/contact"

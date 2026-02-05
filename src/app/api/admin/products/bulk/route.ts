@@ -13,18 +13,14 @@ export async function POST(request: NextRequest) {
     const role = request.headers.get('x-user-role');
 
     if (role !== 'admin') {
-      throw new ApiError('UNAUTHORIZED', 'Admin access required', 403);
+      throw new ApiError(403, 'Admin access required', 'UNAUTHORIZED');
     }
 
     const body = await request.json();
     const { action, product_ids, data } = body;
 
     if (!action || !product_ids || !Array.isArray(product_ids)) {
-      throw new ApiError(
-        'VALIDATION_ERROR',
-        'action and product_ids array are required',
-        400
-      );
+      throw new ApiError(400, 'action and product_ids array are required', 'VALIDATION_ERROR');
     }
 
     let result;
@@ -61,9 +57,9 @@ export async function POST(request: NextRequest) {
       case 'update-price':
         if (!data?.price) {
           throw new ApiError(
-            'VALIDATION_ERROR',
+            400,
             'price is required for update-price action',
-            400
+            'VALIDATION_ERROR'
           );
         }
         result = await prisma.products.updateMany({
@@ -75,9 +71,9 @@ export async function POST(request: NextRequest) {
       case 'update-stock':
         if (data?.quantity_change === undefined) {
           throw new ApiError(
-            'VALIDATION_ERROR',
+            400,
             'quantity_change is required for update-stock action',
-            400
+            'VALIDATION_ERROR'
           );
         }
         // Update each product individually to track changes
@@ -94,9 +90,9 @@ export async function POST(request: NextRequest) {
 
             if (newStock < 0) {
               throw new ApiError(
-                'INVALID_REQUEST',
+                400,
                 `Cannot reduce stock below 0 for product ${id}`,
-                400
+                'INVALID_REQUEST'
               );
             }
 
@@ -117,9 +113,9 @@ export async function POST(request: NextRequest) {
 
       default:
         throw new ApiError(
-          'INVALID_REQUEST',
+          400,
           `Unknown action: ${action}`,
-          400
+          'INVALID_REQUEST'
         );
     }
 

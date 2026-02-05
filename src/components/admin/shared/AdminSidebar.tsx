@@ -64,7 +64,11 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
           section: "Laporan & Analytics",
           items: [
             { label: "Dashboard", href: "/admin/dashboard", icon: BarChart3 },
-            { label: "Laporan Penjualan", href: "/admin/orders", icon: FileText },
+            {
+              label: "Laporan Penjualan",
+              href: "/admin/orders",
+              icon: FileText,
+            },
           ],
         },
         {
@@ -108,7 +112,11 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
         {
           section: "Laporan",
           items: [
-            { label: "Laporan Penjualan", href: `/staff/reports`, icon: BarChart3 },
+            {
+              label: "Laporan Penjualan",
+              href: `/staff/reports`,
+              icon: BarChart3,
+            },
           ],
         },
         {
@@ -239,7 +247,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
                               : "hover:bg-white hover:bg-opacity-10"
                           }`}
                         >
-                          <Icon size={18} className="flex-shrink-0" />
+                          <Icon size={18} className="shrink-0" />
                           <span className="text-sm">{subItem.label}</span>
                           {subItem.badge && (
                             <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -268,7 +276,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
                     : "hover:bg-white hover:bg-opacity-10"
                 }`}
               >
-                <Icon size={18} className="flex-shrink-0" />
+                <Icon size={18} className="shrink-0" />
                 <span className="text-sm">{item.label}</span>
                 {item.badge && (
                   <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -289,7 +297,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition duration-200 font-medium text-sm"
           >
-            <LogOut size={18} className="flex-shrink-0" />
+            <LogOut size={18} className="shrink-0" />
             <span>Keluar</span>
           </button>
         </div>

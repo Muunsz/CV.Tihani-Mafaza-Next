@@ -24,17 +24,17 @@ export async function GET(
 
     // Check if product exists
     const product = await prisma.products.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     if (!product) {
-      throw new ApiError('NOT_FOUND', 'Product not found', 404);
+      throw new ApiError(404, 'Product not found', 'NOT_FOUND');
     }
 
     const [reviews, total] = await Promise.all([
       prisma.product_reviews.findMany({
         where: {
-          product_id: parseInt(params.id),
+          product_id: parseInt(id),
           is_approved: true,
         },
         skip,
@@ -44,7 +44,7 @@ export async function GET(
             select: {
               id: true,
               full_name: true,
-              profile_image_url: true,
+              avatar_url: true,
             },
           },
         },
@@ -52,7 +52,7 @@ export async function GET(
       }),
       prisma.product_reviews.count({
         where: {
-          product_id: parseInt(params.id),
+          product_id: parseInt(id),
           is_approved: true,
         },
       }),
@@ -88,7 +88,7 @@ export async function POST(
     const body = await request.json();
 
     if (!userId) {
-      throw new ApiError('UNAUTHORIZED', 'User ID is required', 401);
+      throw new ApiError(401, 'User ID is required', 'UNAUTHORIZED');
     }
 
     const { rating, title, review_text } = body;
@@ -106,38 +106,34 @@ export async function POST(
     }
 
     if (Object.keys(errors).length > 0) {
-      throw new ApiError('VALIDATION_ERROR', 'Validation failed', 400, errors);
+      throw new ApiError(400, 'Validation failed', 'VALIDATION_ERROR', errors);
     }
 
     // Check if product exists
     const product = await prisma.products.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     if (!product) {
-      throw new ApiError('NOT_FOUND', 'Product not found', 404);
+      throw new ApiError(404, 'Product not found', 'NOT_FOUND');
     }
 
     // Check if user already reviewed this product
     const existingReview = await prisma.product_reviews.findFirst({
       where: {
-        product_id: parseInt(params.id),
+        product_id: parseInt(id),
         user_id: parseInt(userId),
       },
     });
 
     if (existingReview) {
-      throw new ApiError(
-        'CONFLICT',
-        'You have already reviewed this product',
-        409
-      );
+      throw new ApiError(409, 'You have already reviewed this product', 'CONFLICT');
     }
 
     // Create review
     const review = await prisma.product_reviews.create({
       data: {
-        product_id: parseInt(params.id),
+        product_id: parseInt(id),
         user_id: parseInt(userId),
         rating,
         title,

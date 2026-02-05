@@ -19,9 +19,9 @@ export async function GET(request: NextRequest) {
 
     if (!query || query.length < 2) {
       throw new ApiError(
-        'VALIDATION_ERROR',
+        400,
         'Search query must be at least 2 characters',
-        400
+        'VALIDATION_ERROR'
       );
     }
 

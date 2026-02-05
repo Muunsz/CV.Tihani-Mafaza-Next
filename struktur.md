@@ -1,121 +1,781 @@
 # Dokumentasi Struktur Proyek CV. Tihani Mafaza
 
-Dokumen ini menjelaskan seluruh struktur folder dan file dalam proyek Next.js ini, termasuk fungsi dan tujuan setiap komponen.
+Dokumen ini berisi daftar lengkap file dan folder proyek (versi terbaru) beserta penjelasan singkat mengenai fungsi setiap file/ folder. Setiap file/folder dijelaskan menggunakan heading `#` diikuti deskripsi singkat.
 
 ---
 
-## Struktur Folder Utama
+## Struktur Folder Utama (Ringkasan)
 
 ```
 CV.Tihani-Mafaza-Next/
-├── src/                          # Folder utama source code
-├── public/                        # Asset statis (images, icons, dll)
-├── node_modules/                  # Dependencies yang terinstall
-├── .env.local                      # Environment variables lokal (jangan commit)
-├── .gitignore                      # File yang diabaikan Git
-├── next.config.mjs                # Konfigurasi Next.js
-├── tsconfig.json                   # Konfigurasi TypeScript
-├── tailwind.config.js             # Konfigurasi Tailwind CSS
-├── package.json                    # Daftar dependencies dan scripts
-├── STRUKTUR.md                     # Dokumentasi ini
-└── README.md                       # Dokumentasi utama proyek
-
++---node_modules (omitted for brevity)
++---prisma
+|   |   schema.prisma
+|   |   seed.ts
+|   |
+|   \---migrations
+|       |   migration_lock.toml
+|       |
+|       +---20260202060942_add_nextauth_tables
+|       |       migration.sql
+|       |
+|       \---20260202083749_add_product_stocks_table
+|               migration.sql
+|
++---public
+|   |   file.svg
+|   |   globe.svg
+|   |   next.svg
+|   |   vercel.svg
+|   |   window.svg
+|   |
+|   +---icons
+|   |       favicon.ico
+|   |
+|   \---images
+|           Cart.png
+|           Doc.png
+|           Logo.jpg
+|           LogoNoBg.png
+|           Rumah.png
+|           SD Sedunia.png
+|           smk angkasa.jpg
+|           SMK bina insani.jpg
+|           SMK Persis 02.png
+|           smk telkom.jpg
+|           whatsapp.png
+|
++---src
+|   +---app
+|   |   |   error.tsx
+|   |   |   favicon.ico
+|   |   |   globals.css
+|   |   |   layout.tsx
+|   |   |   not-found.tsx
+|   |   |   page.tsx
+|   |   |
+|   |   +---actions
+|   |   |       auth.ts
+|   |   |
+|   |   +---admin
+|   |   |   |   page.tsx
+|   |   |   |
+|   |   |   +---company-profile-management
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---customer
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---customers-management
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---dashboard
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---guest
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---notifications
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---orders
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---portfolio-management
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---products
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---settings
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---staff
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---staff-management
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   \---users
+|   |   |           page.tsx
+|   |   |
+|   |   +---api
+|   |   |   +---admin
+|   |   |   |   +---activity-logs
+|   |   |   |   |       route.ts
+|   |   |   |   |
+|   |   |   |   +---analytics
+|   |   |   |   |   +---customers
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---dashboard
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---products
+|   |   |   |   |   |   \---performance
+|   |   |   |   |   |           route.ts
+|   |   |   |   |   |
+|   |   |   |   |   \---sales
+|   |   |   |   |           route.ts
+|   |   |   |   |
+|   |   |   |   +---categories
+|   |   |   |   |       route.ts
+|   |   |   |   |
+|   |   |   |   +---orders
+|   |   |   |   |   |   route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---export
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   \---[id]
+|   |   |   |   |           route.ts
+|   |   |   |   |
+|   |   |   |   +---products
+|   |   |   |   |   |   route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---bulk
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---bulk-import
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---create
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---filters
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---inventory
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---recommendations
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---search
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   \---[id]
+|   |   |   |   |       |   route.ts
+|   |   |   |   |       |
+|   |   |   |   |       \---reviews
+|   |   |   |   |               route.ts
+|   |   |   |   |
+|   |   |   |   +---promotions
+|   |   |   |   |   |   route.ts
+|   |   |   |   |   |
+|   |   |   |   |   \---verify
+|   |   |   |   |           route.ts
+|   |   |   |   |
+|   |   |   |   +---reviews
+|   |   |   |   |       route.ts
+|   |   |   |   |
+|   |   |   |   +---roles
+|   |   |   |   |       route.ts
+|   |   |   |   |
+|   |   |   |   +---settings
+|   |   |   |   |       route.ts
+|   |   |   |   |
+|   |   |   |   +---user
+|   |   |   |   |   |   route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---export
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   \---[id]
+|   |   |   |   |       \---role
+|   |   |   |   |               route.ts
+|   |   |   |   |
+|   |   |   |   \---users
+|   |   |   |       |   route.ts
+|   |   |   |       |
+|   |   |   |       +---addresses
+|   |   |   |       |   |   route.ts
+|   |   |   |       |   |
+|   |   |   |       |   \---[id]
+|   |   |   |       |           route.ts
+|   |   |   |       |
+|   |   |   |       +---change-password
+|   |   |   |       |       route.ts
+|   |   |   |       |
+|   |   |   |       \---profile
+|   |   |   |               route.ts
+|   |   |   |
+|   |   |   +---customer
+|   |   |   |   +---cart
+|   |   |   |   |   |   route.ts
+|   |   |   |   |   |
+|   |   |   |   |   \---[id]
+|   |   |   |   |           route.ts
+|   |   |   |   |
+|   |   |   |   +---notifications
+|   |   |   |   |       route.ts
+|   |   |   |   |
+|   |   |   |   \---orders
+|   |   |   |       |   route.ts
+|   |   |   |       |
+|   |   |   |       +---checkout
+|   |   |   |       |       route.ts
+|   |   |   |       |
+|   |   |   |       \---[id]
+|   |   |   |           |   route.ts
+|   |   |   |           |
+|   |   |   |           +---cancel
+|   |   |   |           |       route.ts
+|   |   |   |           |
+|   |   |   |           +---payment
+|   |   |   |           |       route.ts
+|   |   |   |           |
+|   |   |   |           +---refund
+|   |   |   |           |       route.ts
+|   |   |   |           |
+|   |   |   |           \---status
+|   |   |   |                   route.ts
+|   |   |   |
+|   |   |   +---guest
+|   |   |   |   +---auth
+|   |   |   |   |   +---login
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---logout
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---register
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---user-role
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---verify-email
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   \---[...nextauth]
+|   |   |   |   |           route.ts
+|   |   |   |   |
+|   |   |   |   +---captcha
+|   |   |   |   |   +---config
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   +---generate
+|   |   |   |   |   |       route.ts
+|   |   |   |   |   |
+|   |   |   |   |   \---verify
+|   |   |   |   |           route.ts
+|   |   |   |   |
+|   |   |   |   +---faq
+|   |   |   |   |   |   route.ts
+|   |   |   |   |   |
+|   |   |   |   |   \---manage
+|   |   |   |   |           route.ts
+|   |   |   |   |
+|   |   |   |   \---homepage
+|   |   |   |           route.ts
+|   |   |   |
+|   |   |   +---products
+|   |   |   |       route.ts
+|   |   |   |
+|   |   |   +---shared
+|   |   |   |   +---health
+|   |   |   |   |       route.ts
+|   |   |   |   |
+|   |   |   |   \---support
+|   |   |   |       \---tickets
+|   |   |   |           |   route.ts
+|   |   |   |           |
+|   |   |   |           \---[id]
+|   |   |   |               |   route.ts
+|   |   |   |               |
+|   |   |   |               +---assign
+|   |   |   |               |       route.ts
+|   |   |   |               |
+|   |   |   |               +---close
+|   |   |   |               |       route.ts
+|   |   |   |               |
+|   |   |   |               +---messages
+|   |   |   |               |       route.ts
+|   |   |   |               |
+|   |   |   |               \---resolve
+|   |   |   |                       route.ts
+|   |   |   |
+|   |   |   \---staff
+|   |   |       +---product-requests
+|   |   |       |       route.ts
+|   |   |       |
+|   |   |       \---quotations
+|   |   |               route.ts
+|   |   |
+|   |   +---customer
+|   |   |   |   page.tsx
+|   |   |   |
+|   |   |   +---cart
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---dashboard
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---notifications
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---orders
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---products
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   \---profile
+|   |   |       |   page.tsx
+|   |   |       |
+|   |   |       +---change-password
+|   |   |       |       page.tsx
+|   |   |       |
+|   |   |       \---edit
+|   |   |               page.tsx
+|   |   |
+|   |   +---downloads
+|   |   |   |   page.tsx
+|   |   |   |
+|   |   |   +---company-profile
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   \---portfolio
+|   |   |           page.tsx
+|   |   |
+|   |   +---guest
+|   |   |   +---about
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---article-detail
+|   |   |   |       ArticleDetailClient.tsx
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---auth
+|   |   |   |   +---forgot-password
+|   |   |   |   |       page.tsx
+|   |   |   |   |
+|   |   |   |   +---login
+|   |   |   |   |       LoginPageClient.tsx
+|   |   |   |   |       page.tsx
+|   |   |   |   |
+|   |   |   |   +---redirect
+|   |   |   |   |       page.tsx
+|   |   |   |   |
+|   |   |   |   +---register
+|   |   |   |   |       page.tsx
+|   |   |   |   |
+|   |   |   |   \---reset-password
+|   |   |   |           page.tsx
+|   |   |   |
+|   |   |   +---blog
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---careers
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---contact
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---faq
+|   |   |   |       faq-client.tsx
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---history
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---portfolio
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---products
+|   |   |   |   |   page.tsx
+|   |   |   |   |
+|   |   |   |   +---detail
+|   |   |   |   |   \---[productid]
+|   |   |   |   |           page.tsx
+|   |   |   |   |
+|   |   |   |   \---[category]
+|   |   |   |           page.tsx
+|   |   |   |
+|   |   |   +---services
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   +---team
+|   |   |   |       page.tsx
+|   |   |   |
+|   |   |   \---testimonials
+|   |   |           page.tsx
+|   |   |
+|   |   \---staff
+|   |       |   page.tsx
+|   |       |
+|   |       +---customers
+|   |       |       page.tsx
+|   |       |
+|   |       +---inventory
+|   |       |       page.tsx
+|   |       |
+|   |       +---notifications
+|   |       |       page.tsx
+|   |       |
+|   |       +---orders
+|   |       |       page.tsx
+|   |       |
+|   |       +---quotations
+|   |       |       page.tsx
+|   |       |
+|   |       +---reports
+|   |       |       page.tsx
+|   |       |
+|   |       \---settings
+|   |               page.tsx
+|   |
+|   +---components
+|   |   +---admin
+|   |   |   |   AdminSidebar.tsx
+|   |   |   |   RoleLayout.tsx
+|   |   |   |
+|   |   |   +---admin
+|   |   |   |       AdminDashboardLayout.tsx
+|   |   |   |       AdminMetrics.tsx
+|   |   |   |       AdminUsersTable.tsx
+|   |   |   |
+|   |   |   +---customer
+|   |   |   |       CustomerAnalytics.tsx
+|   |   |   |       CustomerOrdersTable.tsx
+|   |   |   |       CustomerPortalLayout.tsx
+|   |   |   |
+|   |   |   +---guest
+|   |   |   |       GuestProductBrowser.tsx
+|   |   |   |
+|   |   |   +---shared
+|   |   |   |       AdminHeader.tsx
+|   |   |   |       AdminSidebar.tsx
+|   |   |   |
+|   |   |   \---staff
+|   |   |           StaffAnalytics.tsx
+|   |   |           StaffCustomersTable.tsx
+|   |   |           StaffDashboardLayout.tsx
+|   |   |           StaffOrdersTable.tsx
+|   |   |
+|   |   +---customer
+|   |   |   |   CustomerLayout.tsx
+|   |   |   |   CustomerSidebar.tsx
+|   |   |   |
+|   |   |   +---cart
+|   |   |   |       CartProtectionModal.tsx
+|   |   |   |
+|   |   |   +---products
+|   |   |   |       AddToCartButton.tsx
+|   |   |   |       ProductCard.tsx
+|   |   |   |       ProductGrid.tsx
+|   |   |   |
+|   |   |   \---profile
+|   |   |           ChangePasswordForm.tsx
+|   |   |           EditProfileForm.tsx
+|   |   |
+|   |   +---guest
+|   |   |   |   theme-provider.tsx
+|   |   |   |
+|   |   |   +---auth
+|   |   |   |       ForgotPasswordForm.tsx
+|   |   |   |       LoginForm.tsx
+|   |   |   |       PasswordStrengthChecker.tsx
+|   |   |   |       PermissionGuard.tsx
+|   |   |   |       RegisterForm.tsx
+|   |   |   |       ResetPasswordForm.tsx
+|   |   |   |       SvgCaptcha.tsx
+|   |   |   |
+|   |   |   +---home
+|   |   |   |       FAQSection.tsx
+|   |   |   |       HeroSection.tsx
+|   |   |   |       PartnersSection.tsx
+|   |   |   |       ProductsSection.tsx
+|   |   |   |       ServicesSection.tsx
+|   |   |   |       StatisticsSection.tsx
+|   |   |   |       TestimonialsSection.tsx
+|   |   |   |       USPSection.tsx
+|   |   |   |
+|   |   |   +---layout
+|   |   |   |       FloatingActionButton.tsx
+|   |   |   |       Footer.tsx
+|   |   |   |       Navbar.tsx
+|   |   |   |       NotificationBell.tsx
+|   |   |   |
+|   |   |   \---ui
+|   |   |           accordion.tsx
+|   |   |           alert-dialog.tsx
+|   |   |           alert.tsx
+|   |   |           aspect-ratio.tsx
+|   |   |           avatar.tsx
+|   |   |           badge.tsx
+|   |   |           breadcrumb.tsx
+|   |   |           button-group.tsx
+|   |   |           button.tsx
+|   |   |           calendar.tsx
+|   |   |           card.tsx
+|   |   |           carousel.tsx
+|   |   |           chart.tsx
+|   |   |           checkbox.tsx
+|   |   |           collapsible.tsx
+|   |   |           command.tsx
+|   |   |           context-menu.tsx
+|   |   |           dialog.tsx
+|   |   |           drawer.tsx
+|   |   |           dropdown-menu.tsx
+|   |   |           empty.tsx
+|   |   |           field.tsx
+|   |   |           form.tsx
+|   |   |           hover-card.tsx
+|   |   |           input-group.tsx
+|   |   |           input-otp.tsx
+|   |   |           input.tsx
+|   |   |           item.tsx
+|   |   |           kbd.tsx
+|   |   |           label.tsx
+|   |   |           menubar.tsx
+|   |   |           navigation-menu.tsx
+|   |   |           pagination.tsx
+|   |   |           popover.tsx
+|   |   |           progress.tsx
+|   |   |           radio-group.tsx
+|   |   |           resizable.tsx
+|   |   |           scroll-area.tsx
+|   |   |           select.tsx
+|   |   |           separator.tsx
+|   |   |           sheet.tsx
+|   |   |           sidebar.tsx
+|   |   |           skeleton.tsx
+|   |   |           slider.tsx
+|   |   |           sonner.tsx
+|   |   |           spinner.tsx
+|   |   |           switch.tsx
+|   |   |           table.tsx
+|   |   |           tabs.tsx
+|   |   |           textarea.tsx
+|   |   |           toast.tsx
+|   |   |           toaster.tsx
+|   |   |           toggle-group.tsx
+|   |   |           toggle.tsx
+|   |   |           tooltip.tsx
+|   |   |           use-mobile.tsx
+|   |   |           use-toast.ts
+|   |   |
+|   |   +---shared
+|   |   |   +---common
+|   |   |   |       SkeletonLoaders.tsx
+|   |   |   |
+|   |   |   +---forms
+|   |   |   |       ContactForm.tsx
+|   |   |   |       RequestForm.tsx
+|   |   |   |
+|   |   |   +---products
+|   |   |   |       ProductCard.tsx
+|   |   |   |       ProductGrid.tsx
+|   |   |   |
+|   |   |   \---providers
+|   |   |           ClientProvider.tsx
+|   |   |
+|   |   \---ui
+|   |           toast.ts
+|   |
+|   +---contexts
+|   |       AuthContext.tsx
+|   |
+|   +---hooks
+|   |       use-mobile.ts
+|   |       use-toast.ts
+|   |       useCart.ts
+|   |       useRecaptchaSiteKey.tsx
+|   |       useSvgCaptcha.ts
+|   |
+|   +---lib
+|   |   |   admin-constants.ts
+|   |   |   auth.ts
+|   |   |   constants-expanded.ts
+|   |   |   constants.ts
+|   |   |   env.ts
+|   |   |   prisma.ts
+|   |   |   recaptcha-config.ts
+|   |   |   roles.ts
+|   |   |   utils.ts
+|   |   |
+|   |   +---api
+|   |   |       errors.ts
+|   |   |       middleware.ts
+|   |   |       rate-limit.ts
+|   |   |       response.ts
+|   |   |
+|   |   \---validations
+|   |           index.ts
+|   |
+|   \---types
+|           next-auth.d.ts
 ```
+
+---
+
+# Root files (penjelasan singkat)
+
+# `check-roles.js`
+
+Script utility untuk memeriksa role di database atau konfigurasi (digunakan saat migrasi/seed atau debugging role).
+
+# `eslint.config.mjs`
+
+Konfigurasi ESLint untuk proyek — aturan linting dan plugin yang digunakan.
+
+# `middleware.ts`
+
+Middleware Next.js untuk route protection, redirect, atau pemeriksaan session/role sebelum request diproses.
+
+# `next-env.d.ts`
+
+File deklarasi TypeScript yang dihasilkan oleh Next.js — memastikan environment type definitions tersedia.
+
+# `next.config.ts`
+
+Konfigurasi Next.js (build settings, rewrites, image domains, environment variables overrides).
+
+# `package.json`
+
+Daftar dependencies, devDependencies, dan scripts (build, dev, lint, test, seed, dll).
+
+# `postcss.config.mjs`
+
+Konfigurasi PostCSS / Tailwind (plugins, presets seperti autoprefixer).
+
+# `README.md`
+
+Dokumentasi utama proyek: cara instalasi, menjalankan, dan informasi umum repo.
+
+# `seed-admin.js`
+
+Script untuk menambahkan data admin default ke database (dipakai saat setup/seed).
+
+# `seed-roles.js`
+
+Script untuk menambahkan role default (admin, staff, customer, guest) ke database.
+
+# `struktur.md`
+
+Dokumen ini — daftar dan penjelasan struktur proyek (file yang sedang Anda baca/ubah).
+
+# `tsconfig.json`
+
+Konfigurasi TypeScript: target, paths, strictness, dan compiler options.
+
+---
 
 ---
 
 ## Detail Struktur `/src`
 
 ### `/src/app`
+
 Folder ini menggunakan **App Router** dari Next.js 16 dan berisi semua route aplikasi.
 
 #### `/src/app/layout.tsx`
+
 - **Fungsi**: Root layout untuk seluruh aplikasi
 - **Isi**: Metadata, fonts, providers (NextAuth, Tailwind, dll)
 - **Catatan**: Metadata SEO, Viewport configuration, Providers setup
 
 #### `/src/app/globals.css`
+
 - **Fungsi**: Global CSS styles untuk seluruh aplikasi
 - **Isi**: Tailwind CSS directives, design tokens (CSS variables)
 - **Catatan**: Berisi color palette, spacing, typography definitions
 
 #### `/src/app/page.tsx`
+
 - **Fungsi**: Homepage landing page
 - **Isi**: Hero section, features, CTA buttons, testimonials
 - **Catatan**: Public route, tidak memerlukan auth
 
 #### `/src/app/guest/`
+
 Folder untuk guest/anonymous users yang belum login
 
 ##### `/src/app/guest/layout.tsx`
+
 - **Fungsi**: Layout untuk guest routes
 - **Isi**: Navbar, Footer, Auth styling
 - **Catatan**: Wrapper untuk public authentication pages
 
 ##### `/src/app/guest/auth/`
+
 Folder untuk authentication pages
 
 ###### `/src/app/guest/auth/login/page.tsx`
+
 - **Fungsi**: Halaman login untuk semua user
 - **Isi**: LoginForm component, loading states
 - **Fitur**: Email/password login, Google OAuth, CAPTCHA verification
 - **Redirect**: Ke dashboard sesuai role (admin/staff/customer)
 
 ###### `/src/app/guest/auth/register/page.tsx`
+
 - **Fungsi**: Halaman registrasi user baru
 - **Isi**: RegisterForm component, benefits grid
 - **Fitur**: Form validation, SVG CAPTCHA, Google OAuth signup
 - **Redirect**: Ke login setelah sukses
 
 #### `/src/app/admin/`
+
 Folder untuk admin panel dan admin role features
 
 ##### `/src/app/admin/page.tsx`
+
 - **Fungsi**: Admin portal gateway
 - **Isi**: Card grid untuk pilih role (Admin/Staff/Customer)
 - **Catatan**: Role-based dashboard selector
 
 ##### `/src/app/admin/layout.tsx`
+
 - **Fungsi**: Layout untuk admin routes
 - **Isi**: AdminSidebar, AdminHeader
 - **Catatan**: Protected route, requires admin role
 
 ##### `/src/app/admin/dashboard/page.tsx`
+
 - **Fungsi**: Admin main dashboard
 - **Isi**: Summary stats cards, revenue charts, metrics
 - **Fitur**: LineChart, BarChart dari Recharts
 - **Data**: Orders, users, products, revenue tracking
 
 ##### `/src/app/admin/users/page.tsx`
+
 - **Fungsi**: User management page
 - **Isi**: Users table dengan search & filter
 - **Fitur**: Filter by role (Admin/Staff/Customer), edit/delete actions
 - **Data**: Full name, email, phone, company, role, status
 
 ##### `/src/app/admin/products/page.tsx`
+
 - **Fungsi**: Product management page
 - **Isi**: Products grid/table dengan kategori filter
 - **Fitur**: Price display, stock indicators, rating display
 - **Data**: Product name, category, price, stock, reviews
 
 ##### `/src/app/admin/orders/page.tsx`
+
 - **Fungsi**: Orders management page
 - **Isi**: Orders table dengan status tracking
 - **Fitur**: Status badges, payment status, date formatting
 - **Data**: Order number, customer, total, items, status, payment
 
 ##### `/src/app/admin/settings/page.tsx`
+
 - **Fungsi**: Admin settings & configuration
 - **Isi**: System settings, preferences, configurations
 - **Catatan**: Untuk future implementation
 
 #### `/src/app/staff/`
+
 Folder untuk staff role features
 
 ##### `/src/app/staff/page.tsx`
+
 - **Fungsi**: Staff dashboard untuk order approval
 - **Isi**: Pending orders table, approved orders table
-- **Fitur**: 
+- **Fitur**:
   - View pending orders yang memerlukan approval
   - Approve/reject buttons untuk setiap pesanan
   - Order detail modal dengan informasi lengkap
@@ -126,14 +786,17 @@ Folder untuk staff role features
 - **Catatan**: Staff dapat approve/reject pesanan dan manage shipment status
 
 #### `/src/app/customer/`
+
 Folder untuk customer role features
 
 ##### `/src/app/customer/dashboard/page.tsx`
+
 - **Fungsi**: Customer dashboard
 - **Isi**: Order history, quotation requests, account info
 - **Catatan**: Untuk future implementation
 
 ##### `/src/app/customer/profile/page.tsx`
+
 - **Fungsi**: Customer profile page
 - **Isi**: Profile information, settings, preferences
 - **Catatan**: Untuk future implementation
@@ -141,18 +804,22 @@ Folder untuk customer role features
 ---
 
 ## `/src/components`
+
 Folder untuk reusable React components
 
 ### `/src/components/guest/`
+
 Components untuk guest/public pages
 
 #### `/src/components/guest/layout/`
+
 Layout components untuk guest pages
 
 ##### `Navbar.tsx`
+
 - **Fungsi**: Navigation bar utama
 - **Isi**: Logo, menu links, auth buttons, user dropdown
-- **Fitur**: 
+- **Fitur**:
   - Responsive mobile menu dengan toggle
   - User session detection
   - Role-based navigation
@@ -161,14 +828,17 @@ Layout components untuk guest pages
 - **Props**: None (menggunakan useSession dari NextAuth)
 
 ##### `Footer.tsx`
+
 - **Fungsi**: Footer dengan company info
 - **Isi**: Contact info, links, copyright, social media
 - **Catatan**: Consistent di semua guest pages
 
 #### `/src/components/guest/auth/`
+
 Authentication related components
 
 ##### `LoginForm.tsx`
+
 - **Fungsi**: Form untuk login
 - **Isi**: Email input, password input, remember me checkbox, CAPTCHA, submit button
 - **Fitur**:
@@ -181,6 +851,7 @@ Authentication related components
 - **State**: email, password, error, isLoading, captchaVerified, googleLoading
 
 ##### `RegisterForm.tsx`
+
 - **Fungsi**: Form untuk registrasi user baru
 - **Isi**: Full name, company, email, phone, password, confirm password, CAPTCHA, terms checkbox
 - **Fitur**:
@@ -194,6 +865,7 @@ Authentication related components
 - **API**: POST /api/guest/auth/register
 
 ##### `SvgCaptcha.tsx`
+
 - **Fungsi**: SVG CAPTCHA component untuk verifikasi
 - **Isi**: SVG captcha display, input field, refresh button, verify button
 - **Fitur**:
@@ -203,17 +875,20 @@ Authentication related components
   - Uppercase conversion
   - Success/error message display
   - Verified state indication
-- **API**: 
+- **API**:
   - POST /api/guest/captcha/generate - Generate CAPTCHA
   - POST /api/guest/captcha/verify - Verify CAPTCHA answer
 
 ### `/src/components/admin/`
+
 Components untuk admin dashboard
 
 #### `/src/components/admin/shared/`
+
 Shared admin components
 
 ##### `AdminSidebar.tsx`
+
 - **Fungsi**: Sidebar navigation untuk admin panel
 - **Isi**: Menu items, logo, user info, logout button
 - **Fitur**:
@@ -228,6 +903,7 @@ Shared admin components
 - **Mobile**: Fixed sidebar dengan toggle button
 
 ##### `AdminHeader.tsx`
+
 - **Fungsi**: Header untuk admin pages
 - **Isi**: Page title, subtitle, search bar, notifications, user profile dropdown
 - **Fitur**:
@@ -241,9 +917,11 @@ Shared admin components
 - **Props**: `title: string, subtitle?: string`
 
 #### `/src/components/admin/admin/`
+
 Admin-specific dashboard components
 
 ##### `AdminMetrics.tsx`
+
 - **Fungsi**: Metrics/KPI cards untuk dashboard
 - **Isi**: Revenue, orders count, active users, growth rate
 - **Fitur**:
@@ -255,6 +933,7 @@ Admin-specific dashboard components
 - **Data**: Total revenue, orders, active customers, YoY growth
 
 #### `/src/components/admin/RoleLayout.tsx`
+
 - **Fungsi**: Wrapper layout untuk role-based pages
 - **Isi**: AdminSidebar, AdminHeader, content area
 - **Fitur**:
@@ -267,11 +946,13 @@ Admin-specific dashboard components
 ---
 
 ## `/src/lib`
+
 Utility functions dan constants
 
 ### `constants.ts`
+
 - **Fungsi**: Central repository untuk constants
-- **Isi**: 
+- **Isi**:
   - `COLORS`: Color palette (primary, accent, gray, white)
   - `CONTACT`: Company contact information
   - Navigation menus
@@ -280,11 +961,13 @@ Utility functions dan constants
 - **Usage**: Import di components untuk consistent branding
 
 ### `auth.ts`
+
 - **Fungsi**: Export NextAuth configuration
 - **Isi**: `auth`, `signIn`, `signOut` dari NextAuth route handler
 - **Catatan**: Central authentication access point
 
 ### `prisma.ts`
+
 - **Fungsi**: Prisma client instance
 - **Isi**: Singleton Prisma client initialization
 - **Catatan**: Prevent multiple Prisma instances di development
@@ -292,17 +975,20 @@ Utility functions dan constants
 ---
 
 ## `/src/hooks`
+
 Custom React hooks
 
 ### `useSvgCaptcha.ts`
+
 - **Fungsi**: Hook untuk manage SVG CAPTCHA state dan logic
 - **Isi**: Generate, verify, state management
-- **API Integration**: 
+- **API Integration**:
   - POST `/api/guest/captcha/generate` - Generate CAPTCHA
   - POST `/api/guest/captcha/verify` - Verify answer
 - **Return**: `{ captchaData, userInput, isVerified, error, generateCaptcha, verifyCaptcha }`
 
 ### `use-mobile.ts`
+
 - **Fungsi**: Hook untuk detect mobile screen size
 - **Isi**: Responsive breakpoint detection
 - **Return**: `boolean` - true jika layar < md breakpoint
@@ -310,12 +996,15 @@ Custom React hooks
 ---
 
 ## `/src/app/api`
+
 API routes untuk backend operations
 
 ### `/src/app/api/guest/auth/[...nextauth]/`
+
 NextAuth configuration dan handlers
 
 #### `route.ts`
+
 - **Fungsi**: NextAuth route handler
 - **Providers**:
   - **GoogleProvider**: OAuth 2.0 login dengan Google
@@ -334,15 +1023,18 @@ NextAuth configuration dan handlers
   - HTTPS-only cookies di production
 
 ### `/src/app/api/guest/captcha/`
+
 CAPTCHA generation dan verification endpoints
 
 #### `/generate/route.ts`
+
 - **Fungsi**: Generate SVG CAPTCHA
 - **Method**: POST
 - **Return**: `{ svg: string, id: string }` - SVG content dan unique ID
 - **Catatan**: Random 4-digit code embedded dalam SVG
 
 #### `/verify/route.ts`
+
 - **Fungsi**: Verify CAPTCHA answer
 - **Method**: POST
 - **Body**: `{ id: string, answer: string }`
@@ -350,11 +1042,12 @@ CAPTCHA generation dan verification endpoints
 - **Validation**: Case-insensitive comparison
 
 ### `/src/app/api/guest/auth/register/route.ts`
+
 User registration endpoint
 
 - **Fungsi**: Handle user registration
 - **Method**: POST
-- **Body**: 
+- **Body**:
   ```json
   {
     "fullName": string,
@@ -397,6 +1090,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 Struktur database yang digunakan dalam aplikasi:
 
 ### Users Table
+
 ```
 - id: UUID (primary key)
 - email: String (unique)
@@ -413,6 +1107,7 @@ Struktur database yang digunakan dalam aplikasi:
 ```
 
 ### Roles Table
+
 ```
 - id: UUID (primary key)
 - name: String (admin, staff, customer, guest)
@@ -420,6 +1115,7 @@ Struktur database yang digunakan dalam aplikasi:
 ```
 
 ### Orders Table
+
 ```
 - id: UUID (primary key)
 - user_id: UUID (foreign key)
@@ -432,6 +1128,7 @@ Struktur database yang digunakan dalam aplikasi:
 ```
 
 ### Order Items Table
+
 ```
 - id: UUID (primary key)
 - order_id: UUID (foreign key)
@@ -441,6 +1138,7 @@ Struktur database yang digunakan dalam aplikasi:
 ```
 
 ### Products Table
+
 ```
 - id: UUID (primary key)
 - name: String
@@ -458,6 +1156,7 @@ Struktur database yang digunakan dalam aplikasi:
 ## Authentication Flow
 
 ### Login Process
+
 1. User input email & password
 2. User verify CAPTCHA
 3. Submit LoginForm
@@ -469,6 +1168,7 @@ Struktur database yang digunakan dalam aplikasi:
    - customer → `/customer/dashboard`
 
 ### Google OAuth Process
+
 1. User click "Login/Register dengan Google"
 2. Redirect ke Google OAuth consent screen
 3. Google return authorization code
@@ -479,6 +1179,7 @@ Struktur database yang digunakan dalam aplikasi:
 8. Redirect ke customer dashboard
 
 ### CAPTCHA Verification
+
 1. Component mount → call `/api/guest/captcha/generate`
 2. Backend generate random 4-digit code + SVG
 3. Return SVG content & unique ID ke frontend
@@ -493,6 +1194,7 @@ Struktur database yang digunakan dalam aplikasi:
 ## Key Features Implemented
 
 ### 1. Authentication System
+
 - Email/password login dengan password hashing (bcryptjs)
 - Google OAuth integration (auto user creation)
 - JWT-based session management
@@ -500,6 +1202,7 @@ Struktur database yang digunakan dalam aplikasi:
 - SVG CAPTCHA untuk spam prevention
 
 ### 2. Admin Dashboard
+
 - Dashboard dengan metrics & charts
 - User management (CRUD operations)
 - Product management dengan kategori filter
@@ -507,6 +1210,7 @@ Struktur database yang digunakan dalam aplikasi:
 - Settings page untuk configuration
 
 ### 3. Staff Dashboard
+
 - Pending orders approval system
 - Order detail modal untuk review
 - Approve/reject functionality
@@ -515,6 +1219,7 @@ Struktur database yang digunakan dalam aplikasi:
 - Invoice download capability
 
 ### 4. Admin Sidebar
+
 - Role-based navigation menu
 - Sticky header dengan user profile
 - Mobile responsive dengan toggle
@@ -522,6 +1227,7 @@ Struktur database yang digunakan dalam aplikasi:
 - Logout functionality
 
 ### 5. Guest Features
+
 - Landing page dengan hero section
 - Login/register forms dengan validation
 - SVG CAPTCHA verification
@@ -534,6 +1240,7 @@ Struktur database yang digunakan dalam aplikasi:
 ## Styling & Design System
 
 ### Color Palette
+
 ```
 Primary: #0e2431 (Navy Blue)
 Accent: #ff4f00 (Orange)
@@ -546,11 +1253,13 @@ Info: #3b82f6 (Blue)
 ```
 
 ### Typography
+
 - Heading: Font-bold, using CSS color variables
 - Body: Regular weight, 14-16px
 - Caption: Smaller size, gray color
 
 ### Layout
+
 - Flexbox untuk most layouts
 - Responsive grid untuk multi-column
 - Mobile-first design approach
@@ -558,6 +1267,7 @@ Info: #3b82f6 (Blue)
 - Consistent spacing (gap, padding utilities)
 
 ### Components
+
 - Rounded borders (rounded-lg)
 - Shadow for depth (shadow-sm, shadow-md)
 - Border styling (border, border-gray-200)
@@ -599,6 +1309,7 @@ Info: #3b82f6 (Blue)
 ## Development Guidelines
 
 ### Adding New Page
+
 1. Create folder di `/src/app/[route]/`
 2. Create `page.tsx` atau `layout.tsx`
 3. Import necessary components & utilities
@@ -606,6 +1317,7 @@ Info: #3b82f6 (Blue)
 5. Add navigation link ke menu
 
 ### Adding New Component
+
 1. Create file di `/src/components/[feature]/`
 2. Export as named export
 3. Use TypeScript interfaces untuk props
@@ -613,6 +1325,7 @@ Info: #3b82f6 (Blue)
 5. Responsive design considerations
 
 ### Adding New API Route
+
 1. Create folder di `/src/app/api/[route]/`
 2. Create `route.ts` dengan handler functions
 3. Implement proper error handling
@@ -620,6 +1333,7 @@ Info: #3b82f6 (Blue)
 5. Return appropriate status codes
 
 ### Database Changes
+
 1. Update schema di `prisma/schema.prisma`
 2. Create migration: `npx prisma migrate dev --name`
 3. Update Prisma client imports

@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const skip = (params.page - 1) * params.limit;
 
     // Users can only see their own quotations, admin/staff can see all
-    const where: any = {};
+    const where: { user_id?: number } = {};
     if (role !== 'admin' && role !== 'staff') {
       where.user_id = parseInt(userId || '0');
     }

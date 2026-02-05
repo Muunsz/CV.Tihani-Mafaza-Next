@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { StaffDashboardLayout } from '@/components/admin/staff/StaffDashboardLayout';
-import { COLORS } from '@/lib/constants';
-import { Bell, Lock, User, Eye, EyeOff } from 'lucide-react';
-import { useState } from 'react';
+import { StaffDashboardLayout } from "@/components/admin/staff/StaffDashboardLayout";
+import { COLORS } from "@/lib/constants";
+import { Bell, Lock, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 function SettingsContent() {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +22,9 @@ function SettingsContent() {
         <h1 className="text-3xl font-bold" style={{ color: COLORS.primary }}>
           Pengaturan
         </h1>
-        <p className="text-gray-600 mt-2">Kelola preferensi dan keamanan akun Anda</p>
+        <p className="text-gray-600 mt-2">
+          Kelola preferensi dan keamanan akun Anda
+        </p>
       </div>
 
       {/* Profile Settings */}
@@ -42,12 +44,18 @@ function SettingsContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Nama Lengkap</label>
+            <label className="block text-sm font-medium mb-2">
+              Nama Lengkap
+            </label>
             <input
               type="text"
               defaultValue="Ahmad Suryanto"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
-              style={{ borderColor: COLORS.border, '--tw-ring-color': COLORS.accent } as any}
+              style={{
+                borderColor: COLORS.border,
+                // @ts-expect-error: allow custom CSS property for Tailwind ring
+                "--tw-ring-color": COLORS.accent,
+              }}
             />
           </div>
           <div>
@@ -56,7 +64,11 @@ function SettingsContent() {
               type="email"
               defaultValue="ahmad@tihani.com"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
-              style={{ borderColor: COLORS.border, '--tw-ring-color': COLORS.accent } as any}
+              style={{
+                borderColor: COLORS.border,
+                // @ts-expect-error: allow custom CSS property for Tailwind ring
+                "--tw-ring-color": COLORS.accent,
+              }}
             />
           </div>
           <div>
@@ -65,7 +77,11 @@ function SettingsContent() {
               type="tel"
               defaultValue="+62 812-3456-7890"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
-              style={{ borderColor: COLORS.border, '--tw-ring-color': COLORS.accent } as any}
+              style={{
+                borderColor: COLORS.border,
+                // @ts-expect-error: allow custom CSS property for Tailwind ring
+                "--tw-ring-color": COLORS.accent,
+              }}
             />
           </div>
           <div>
@@ -74,7 +90,11 @@ function SettingsContent() {
               type="text"
               defaultValue="Sales & Marketing"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
-              style={{ borderColor: COLORS.border, '--tw-ring-color': COLORS.accent } as any}
+              style={{
+                borderColor: COLORS.border,
+                // @ts-expect-error: allow custom CSS property for Tailwind ring
+                "--tw-ring-color": COLORS.accent,
+              }}
             />
           </div>
         </div>
@@ -96,13 +116,19 @@ function SettingsContent() {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Password Lama</label>
+            <label className="block text-sm font-medium mb-2">
+              Password Lama
+            </label>
             <div className="relative">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 placeholder="Masukkan password lama"
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 pr-10"
-                style={{ borderColor: COLORS.border, '--tw-ring-color': COLORS.accent } as any}
+                style={{
+                  borderColor: COLORS.border,
+                  // @ts-expect-error: allow custom CSS property for Tailwind ring
+                  "--tw-ring-color": COLORS.accent,
+                }}
               />
               <button
                 onClick={() => setShowPassword(!showPassword)}
@@ -113,21 +139,33 @@ function SettingsContent() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Password Baru</label>
+            <label className="block text-sm font-medium mb-2">
+              Password Baru
+            </label>
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               placeholder="Masukkan password baru"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
-              style={{ borderColor: COLORS.border, '--tw-ring-color': COLORS.accent } as any}
+              style={{
+                borderColor: COLORS.border,
+                // @ts-expect-error: allow custom CSS property for Tailwind ring
+                "--tw-ring-color": COLORS.accent,
+              }}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Konfirmasi Password</label>
+            <label className="block text-sm font-medium mb-2">
+              Konfirmasi Password
+            </label>
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               placeholder="Konfirmasi password baru"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
-              style={{ borderColor: COLORS.border, '--tw-ring-color': COLORS.accent } as any}
+              style={{
+                borderColor: COLORS.border,
+                // @ts-expect-error: allow custom CSS property for Tailwind ring
+                "--tw-ring-color": COLORS.accent,
+              }}
             />
           </div>
         </div>
@@ -149,13 +187,36 @@ function SettingsContent() {
 
         <div className="space-y-4">
           {[
-            { key: 'emailNotifications', label: 'Notifikasi Email', desc: 'Terima update via email' },
-            { key: 'smsNotifications', label: 'Notifikasi SMS', desc: 'Terima update via SMS' },
-            { key: 'pushNotifications', label: 'Notifikasi Push', desc: 'Terima notifikasi push di browser' },
-            { key: 'orderAlerts', label: 'Alert Pesanan Baru', desc: 'Dapatkan alert untuk pesanan baru' },
-            { key: 'lowStockAlerts', label: 'Alert Stok Rendah', desc: 'Dapatkan alert saat stok rendah' },
+            {
+              key: "emailNotifications",
+              label: "Notifikasi Email",
+              desc: "Terima update via email",
+            },
+            {
+              key: "smsNotifications",
+              label: "Notifikasi SMS",
+              desc: "Terima update via SMS",
+            },
+            {
+              key: "pushNotifications",
+              label: "Notifikasi Push",
+              desc: "Terima notifikasi push di browser",
+            },
+            {
+              key: "orderAlerts",
+              label: "Alert Pesanan Baru",
+              desc: "Dapatkan alert untuk pesanan baru",
+            },
+            {
+              key: "lowStockAlerts",
+              label: "Alert Stok Rendah",
+              desc: "Dapatkan alert saat stok rendah",
+            },
           ].map((notification) => (
-            <div key={notification.key} className="flex items-center justify-between p-3 border rounded-lg">
+            <div
+              key={notification.key}
+              className="flex items-center justify-between p-3 border rounded-lg"
+            >
               <div>
                 <p className="font-medium">{notification.label}</p>
                 <p className="text-sm text-gray-600">{notification.desc}</p>
@@ -164,7 +225,10 @@ function SettingsContent() {
                 type="checkbox"
                 checked={settings[notification.key as keyof typeof settings]}
                 onChange={(e) =>
-                  setSettings({ ...settings, [notification.key]: e.target.checked })
+                  setSettings({
+                    ...settings,
+                    [notification.key]: e.target.checked,
+                  })
                 }
                 className="w-5 h-5 rounded"
               />
@@ -181,7 +245,10 @@ function SettingsContent() {
       </div>
 
       {/* Account Status */}
-      <div className="bg-white rounded-lg shadow p-6 border-l-4" style={{ borderColor: COLORS.accent }}>
+      <div
+        className="bg-white rounded-lg shadow p-6 border-l-4"
+        style={{ borderColor: COLORS.accent }}
+      >
         <h3 className="text-lg font-bold mb-4">Status Akun</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">

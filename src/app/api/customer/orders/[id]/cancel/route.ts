@@ -25,7 +25,7 @@ export async function POST(
     });
 
     if (!order) {
-      throw new ApiError('NOT_FOUND', 'Order not found', 404);
+      throw new ApiError(404, 'Order not found', 'NOT_FOUND');
     }
 
     // Check authorization - user can only cancel their own orders, admin/staff can cancel any
@@ -34,7 +34,7 @@ export async function POST(
       userRole !== 'staff' &&
       order.user_id !== parseInt(userId || '0')
     ) {
-      throw new ApiError('FORBIDDEN', 'Cannot cancel this order', 403);
+      throw new ApiError(403, 'Cannot cancel this order', 'FORBIDDEN');
     }
 
     // Check if order can be cancelled
@@ -42,9 +42,9 @@ export async function POST(
       !['pending', 'processing'].includes(order.order_status || '')
     ) {
       throw new ApiError(
-        'INVALID_REQUEST',
+        400,
         `Cannot cancel order with status: ${order.order_status}`,
-        400
+        'INVALID_REQUEST'
       );
     }
 

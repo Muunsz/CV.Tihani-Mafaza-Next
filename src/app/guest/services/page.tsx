@@ -120,14 +120,14 @@ export default function ServicesPage() {
               className="text-2xl italic font-semibold mb-4"
               style={{ color: COLORS.primary }}
             >
-              "Kepuasan Anda adalah Prestasi Kami"
+              &quot;Kepuasan Anda adalah Prestasi Kami&quot;
             </blockquote>
             <p className="text-gray-600 text-lg mb-6">
               Motto ini menjadi komitmen utama kami dalam setiap interaksi
               dengan pelanggan.
             </p>
             <p className="text-gray-600 text-lg italic">
-              "A thousand miles journey begins with one small step" - Mari
+              &quot;A thousand miles journey begins with one small step&quot; - Mari
               bersama membangun kepercayaan dan kemitraan jangka panjang.
             </p>
           </div>

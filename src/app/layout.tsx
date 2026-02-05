@@ -1,13 +1,19 @@
 import React from "react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+// Using system font stack to avoid build-time Google Fonts fetch issues
+// import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ClientProvider } from "@/components/shared/providers/ClientProvider";
 import { FloatingActionButton } from "@/components/guest/layout/FloatingActionButton";
+import { validateEnv } from "@/lib/env";
 import "./globals.css";
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+// Validate environment variables at startup
+validateEnv();
+
+// Use system font stack (avoids network call during build)
+// const _geist = Geist({ subsets: ["latin"] });
+// const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "CV. Tihani Mafaza - Penyedia Barang & Jasa Profesional",
@@ -54,7 +60,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <body className={`${_geist.className} font-sans antialiased`}>
+      <body className={`font-sans antialiased`}>
         <ClientProvider>
           {children}
           <FloatingActionButton />

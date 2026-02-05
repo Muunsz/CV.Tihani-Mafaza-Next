@@ -4,12 +4,10 @@ import { Navbar } from "@/components/guest/layout/Navbar";
 import { Footer } from "@/components/guest/layout/Footer";
 import { LoginForm } from "@/components/guest/auth/LoginForm";
 import { COLORS } from "@/lib/constants";
-import { signIn } from "next-auth/react";
 
 export function LoginPageClient() {
-  const handleGoogleSignIn = async () => {
-    await signIn("google", { callbackUrl: "/auth/redirect" });
-  };
+  // Google sign-in is handled by LoginForm component
+  // No need to duplicate logic here
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
